@@ -197,6 +197,6 @@ Ordner: `src/` (Paket), `demo/` (Demo-Seite), `e2e/` (Playwright-Tests), `test/`
 
 **Neue Version veröffentlichen:** Version in `package.json` erhöhen, `npm run build && npm test`,
 CHANGELOG ergänzen, committen und pushen. Dann auf GitHub → **Releases** → **Draft a new release**
-→ Tag `vX.Y.Z` neu anlegen → **Publish release**.
+→ Tag `vX.Y.Z` neu anlegen, als Ziel den Branch `main` wählen → **Publish release**.
 
 Lizenz: MIT
