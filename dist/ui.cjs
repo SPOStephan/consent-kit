@@ -115,8 +115,13 @@ function Links({ config, texts }) {
     /* @__PURE__ */ jsxRuntime.jsx("a", { href: config.links.imprint, children: texts.imprint })
   ] });
 }
+function useLoadedContext() {
+  const ctx = react.useConsentContext();
+  if (!ctx.config) throw new Error("consent-kit: Konfiguration noch nicht geladen.");
+  return { ...ctx, config: ctx.config };
+}
 function ConsentBanner({ position, onOpenSettings }) {
-  const { config, texts } = react.useConsentContext();
+  const { config, texts } = useLoadedContext();
   const { state, acceptAll, rejectAll } = react.useConsent();
   const ref = react$1.useRef(null);
   const titleId = react$1.useId();
@@ -191,7 +196,7 @@ function ServiceDetails({ meta, texts, language, children }) {
   ] });
 }
 function ConsentSettings({ onClose, owner }) {
-  const { config, texts, language } = react.useConsentContext();
+  const { config, texts, language } = useLoadedContext();
   const { state, acceptAll, rejectAll, setCategories } = react.useConsent();
   const categoryIds = react$1.useMemo(() => consentKit.getManager().getCategoryIds(), []);
   const [draft, setDraft] = react$1.useState(() => initialDraft(state, categoryIds));
@@ -321,6 +326,10 @@ function ConsentSettings({ onClose, owner }) {
 }
 function ConsentUI({ owner } = {}) {
   const { config } = react.useConsentContext();
+  if (!config) return null;
+  return /* @__PURE__ */ jsxRuntime.jsx(ConsentUIInner, { owner, config });
+}
+function ConsentUIInner({ owner, config }) {
   const { state, ready } = react.useConsent();
   const [settingsOpen, setSettingsOpen] = react$1.useState(false);
   const pathname = usePathname();

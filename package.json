@@ -52,6 +52,16 @@
         "default": "./dist/table.cjs"
       }
     },
+    "./remote": {
+      "import": {
+        "types": "./dist/remote.d.ts",
+        "default": "./dist/remote.js"
+      },
+      "require": {
+        "types": "./dist/remote.d.cts",
+        "default": "./dist/remote.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "bin": {

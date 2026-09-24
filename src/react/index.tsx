@@ -4,6 +4,8 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
+  useState,
   useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
@@ -15,14 +17,17 @@ import {
   init,
   resolveLanguage,
   resolveTexts,
+  defaultTexts,
   type ConsentConfig,
   type ConsentState,
   type Language,
   type Texts,
 } from 'consent-kit';
+import { loadRemoteConfig, type RemoteOptions } from 'consent-kit/remote';
 
 interface ConsentContextValue {
-  config: ConsentConfig;
+  /** null, solange die Einstellungen noch vom Backend geladen werden. */
+  config: ConsentConfig | null;
   language: Language;
   texts: Texts;
 }
@@ -68,22 +73,60 @@ const serverSnapshot = {
 
 // ---------------------------------------------------------------- Provider
 
-export interface ConsentProviderProps {
-  /** Ihre Konfiguration aus consent.config.ts. */
-  config: ConsentConfig;
-  children?: ReactNode;
-}
+export type ConsentProviderProps =
+  | {
+      /** Ihre Konfiguration aus consent.config.ts. */
+      config: ConsentConfig;
+      remote?: undefined;
+      children?: ReactNode;
+    }
+  | {
+      config?: undefined;
+      /**
+       * Einstellungen zentral aus dem consent-kit Backend laden, z. B.
+       * { endpoint: 'https://consent.meine-firma.de', siteId: 'meine-seite', fallback: {...} }.
+       * Den fertigen Code liefert die Admin-Oberfläche unter „Einbau“.
+       */
+      remote: RemoteOptions;
+      children?: ReactNode;
+    };
 
 /**
  * Startet consent-kit und stellt den Zustand für useConsent(), <ConsentGate> und
  * die Standard-UI bereit. Einmal um die App legen (z. B. in main.tsx).
  */
-export function ConsentProvider({ config, children }: ConsentProviderProps) {
+export function ConsentProvider({ config: localConfig, remote, children }: ConsentProviderProps) {
+  const [remoteConfig, setRemoteConfig] = useState<ConsentConfig | null>(null);
+  const remoteKey = remote ? `${remote.endpoint}|${remote.siteId}` : '';
+  const remoteRef = useRef(remote);
+  remoteRef.current = remote;
+
   useEffect(() => {
-    init(config);
+    const options = remoteRef.current;
+    if (!options) return;
+    let cancelled = false;
+    loadRemoteConfig(options).then(
+      (loaded) => {
+        if (!cancelled) setRemoteConfig(loaded);
+      },
+      (error: unknown) => {
+        // Ohne Einstellungen lädt aus Sicherheitsgründen KEIN Dienst.
+        if (typeof console !== 'undefined') console.error(error);
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [remoteKey]);
+
+  const config = localConfig ?? remoteConfig;
+
+  useEffect(() => {
+    if (config) init(config);
   }, [config]);
 
   const value = useMemo<ConsentContextValue>(() => {
+    if (!config) return { config: null, language: 'de', texts: defaultTexts.de };
     const language = resolveLanguage(config);
     return { config, language, texts: resolveTexts(config, language) };
   }, [config]);
@@ -96,6 +139,11 @@ export function useConsentContext(): ConsentContextValue {
   const ctx = useContext(ConsentContext);
   if (!ctx) throw new Error('consent-kit: useConsent() muss innerhalb von <ConsentProvider> verwendet werden.');
   return ctx;
+}
+
+/** Aktuelle Konfiguration (null, solange sie noch vom Backend geladen wird) – z. B. für getServiceRows(). */
+export function useConsentConfig(): ConsentConfig | null {
+  return useConsentContext().config;
 }
 
 export interface UseConsentResult {
@@ -216,7 +264,7 @@ export function ConsentGate({ service, children, placeholder, aspectRatio, class
   if (hasConsent(service)) return <>{typeof children === 'function' ? children() : children}</>;
   if (placeholder !== undefined) return <>{typeof placeholder === 'function' ? placeholder(load) : placeholder}</>;
 
-  const plugin = config.services.find((p) => p.id === service);
+  const plugin = config?.services.find((p) => p.id === service);
   const name = plugin?.meta.name ?? service;
   const third = plugin?.meta.thirdCountryTransfer?.[language];
   const thirdText = third ? (language === 'de' ? `, ggf. auch in Drittländer (${third})` : `, possibly also to third countries (${third})`) : '';
@@ -224,7 +272,7 @@ export function ConsentGate({ service, children, placeholder, aspectRatio, class
   return (
     <div
       className={['ck-gate', className].filter(Boolean).join(' ')}
-      data-ck-scheme={config.ui?.colorScheme ?? 'auto'}
+      data-ck-scheme={config?.ui?.colorScheme ?? 'auto'}
       style={aspectRatio ? { aspectRatio } : undefined}
       role="group"
       aria-label={`${texts.gateTitle}: ${name}`}
@@ -252,3 +300,4 @@ export function ConsentGate({ service, children, placeholder, aspectRatio, class
 }
 
 export type { ConsentConfig, ConsentState } from 'consent-kit';
+export type { RemoteOptions, RemoteSiteConfig } from 'consent-kit/remote';

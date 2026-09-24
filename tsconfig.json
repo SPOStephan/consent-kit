@@ -20,7 +20,8 @@
       "consent-kit": ["./src/index.ts"],
       "consent-kit/react": ["./src/react/index.tsx"],
       "consent-kit/ui": ["./src/ui/index.tsx"],
-      "consent-kit/table": ["./src/table/index.ts"]
+      "consent-kit/table": ["./src/table/index.ts"],
+      "consent-kit/remote": ["./src/remote/index.ts"]
     }
   },
   "include": ["src", "test", "e2e", "demo", "worker/src", "worker/test", "playwright.config.ts", "vitest.config.ts", "tsup.config.ts"]

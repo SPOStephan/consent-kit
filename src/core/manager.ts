@@ -414,6 +414,7 @@ export class ConsentManager {
       services: s.services,
       gpc: s.gpc,
       domain: location.hostname,
+      ...(this.config?.logging?.siteId ? { siteId: this.config.logging.siteId } : {}),
     });
     // text/plain = "einfacher" Request ohne CORS-Preflight; keepalive überlebt einen Reload.
     fetch(endpoint, {

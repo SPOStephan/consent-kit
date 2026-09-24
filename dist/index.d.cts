@@ -201,7 +201,11 @@ interface ConsentConfig {
     logging?: {
         /** URL des Protokollierungs-Endpunkts (z. B. der Cloudflare Worker). */
         endpoint: string;
+        /** Kennung der Website im consent-kit Backend (wird mitgesendet). */
+        siteId?: string;
     };
+    /** Betreiber der Website (Anbieter des eigenen Einwilligungs-Cookies im Dialog und in der Tabelle). */
+    owner?: string;
     /**
      * Global Privacy Control: Sendet der Browser GPC, wird Marketing bei
      * "Alle akzeptieren" nicht aktiviert. Standard: false.

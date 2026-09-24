@@ -168,7 +168,7 @@ export function formatText(template: string, values: Record<string, string>): st
  * Angaben zum eigenen Einwilligungs-Cookie (Kategorie "notwendig") – für Dialog
  * und Datenschutz-Tabelle. MUSTERTEXT – rechtlich prüfen lassen.
  */
-export function consentCookieMeta(config: ConsentConfig, owner = ''): ServiceMeta {
+export function consentCookieMeta(config: ConsentConfig, owner = config.owner ?? ''): ServiceMeta {
   const days = Math.min(config.cookie?.maxAgeDays ?? 365, 365);
   const duration = days === 365 ? { de: '12 Monate', en: '12 months' } : { de: `${days} Tage`, en: `${days} days` };
   return {

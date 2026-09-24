@@ -1,7 +1,7 @@
 import { useRef, useId, useMemo, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { getManager, serviceCategories, consentCookieMeta } from 'consent-kit';
-import { useConsentContext, useConsent } from 'consent-kit/react';
+import { useConsent, useConsentContext } from 'consent-kit/react';
 import { jsxs, Fragment, jsx } from 'react/jsx-runtime';
 
 // src/ui/index.tsx
@@ -113,8 +113,13 @@ function Links({ config, texts }) {
     /* @__PURE__ */ jsx("a", { href: config.links.imprint, children: texts.imprint })
   ] });
 }
+function useLoadedContext() {
+  const ctx = useConsentContext();
+  if (!ctx.config) throw new Error("consent-kit: Konfiguration noch nicht geladen.");
+  return { ...ctx, config: ctx.config };
+}
 function ConsentBanner({ position, onOpenSettings }) {
-  const { config, texts } = useConsentContext();
+  const { config, texts } = useLoadedContext();
   const { state, acceptAll, rejectAll } = useConsent();
   const ref = useRef(null);
   const titleId = useId();
@@ -189,7 +194,7 @@ function ServiceDetails({ meta, texts, language, children }) {
   ] });
 }
 function ConsentSettings({ onClose, owner }) {
-  const { config, texts, language } = useConsentContext();
+  const { config, texts, language } = useLoadedContext();
   const { state, acceptAll, rejectAll, setCategories } = useConsent();
   const categoryIds = useMemo(() => getManager().getCategoryIds(), []);
   const [draft, setDraft] = useState(() => initialDraft(state, categoryIds));
@@ -319,6 +324,10 @@ function ConsentSettings({ onClose, owner }) {
 }
 function ConsentUI({ owner } = {}) {
   const { config } = useConsentContext();
+  if (!config) return null;
+  return /* @__PURE__ */ jsx(ConsentUIInner, { owner, config });
+}
+function ConsentUIInner({ owner, config }) {
   const { state, ready } = useConsent();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const pathname = usePathname();

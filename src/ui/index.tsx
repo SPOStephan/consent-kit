@@ -151,6 +151,13 @@ function Links({ config, texts }: { config: ConsentConfig; texts: Texts }) {
   );
 }
 
+/** Kontext mit geladener Konfiguration (Banner/Dialog werden erst danach gerendert). */
+function useLoadedContext() {
+  const ctx = useConsentContext();
+  if (!ctx.config) throw new Error('consent-kit: Konfiguration noch nicht geladen.');
+  return { ...ctx, config: ctx.config };
+}
+
 // ---------------------------------------------------------------- Banner
 
 export interface ConsentBannerProps {
@@ -160,7 +167,7 @@ export interface ConsentBannerProps {
 
 /** Erste Ebene: "Alle ablehnen" und "Alle akzeptieren" gleichwertig nebeneinander. */
 export function ConsentBanner({ position, onOpenSettings }: ConsentBannerProps) {
-  const { config, texts } = useConsentContext();
+  const { config, texts } = useLoadedContext();
   const { state, acceptAll, rejectAll } = useConsent();
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
@@ -274,7 +281,7 @@ export interface ConsentSettingsProps {
 
 /** Zweite Ebene: Kategorien mit Schaltern und aufklappbaren Dienst-Details. */
 export function ConsentSettings({ onClose, owner }: ConsentSettingsProps) {
-  const { config, texts, language } = useConsentContext();
+  const { config, texts, language } = useLoadedContext();
   const { state, acceptAll, rejectAll, setCategories } = useConsent();
   const categoryIds = useMemo(() => getManager().getCategoryIds(), []);
   const [draft, setDraft] = useState(() => initialDraft(state, categoryIds));
@@ -430,6 +437,11 @@ export interface ConsentUIProps {
  */
 export function ConsentUI({ owner }: ConsentUIProps = {}) {
   const { config } = useConsentContext();
+  if (!config) return null; // Einstellungen werden noch geladen
+  return <ConsentUIInner owner={owner} config={config} />;
+}
+
+function ConsentUIInner({ owner, config }: ConsentUIProps & { config: ConsentConfig }) {
   const { state, ready } = useConsent();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const pathname = usePathname();

@@ -2,24 +2,39 @@ import * as react from 'react';
 import { ReactNode, CSSProperties } from 'react';
 import { ConsentConfig, ConsentState, Language, Texts } from 'consent-kit';
 export { ConsentConfig, ConsentState } from 'consent-kit';
+import { RemoteOptions } from 'consent-kit/remote';
+export { RemoteOptions, RemoteSiteConfig } from 'consent-kit/remote';
 
 interface ConsentContextValue {
-    config: ConsentConfig;
+    /** null, solange die Einstellungen noch vom Backend geladen werden. */
+    config: ConsentConfig | null;
     language: Language;
     texts: Texts;
 }
-interface ConsentProviderProps {
+type ConsentProviderProps = {
     /** Ihre Konfiguration aus consent.config.ts. */
     config: ConsentConfig;
+    remote?: undefined;
     children?: ReactNode;
-}
+} | {
+    config?: undefined;
+    /**
+     * Einstellungen zentral aus dem consent-kit Backend laden, z. B.
+     * { endpoint: 'https://consent.meine-firma.de', siteId: 'meine-seite', fallback: {...} }.
+     * Den fertigen Code liefert die Admin-Oberfläche unter „Einbau“.
+     */
+    remote: RemoteOptions;
+    children?: ReactNode;
+};
 /**
  * Startet consent-kit und stellt den Zustand für useConsent(), <ConsentGate> und
  * die Standard-UI bereit. Einmal um die App legen (z. B. in main.tsx).
  */
-declare function ConsentProvider({ config, children }: ConsentProviderProps): react.JSX.Element;
+declare function ConsentProvider({ config: localConfig, remote, children }: ConsentProviderProps): react.JSX.Element;
 /** Konfiguration, Sprache und Texte (nur innerhalb von <ConsentProvider>). */
 declare function useConsentContext(): ConsentContextValue;
+/** Aktuelle Konfiguration (null, solange sie noch vom Backend geladen wird) – z. B. für getServiceRows(). */
+declare function useConsentConfig(): ConsentConfig | null;
 interface UseConsentResult {
     /** Aktueller Zustand. */
     state: ConsentState;
@@ -79,4 +94,4 @@ interface ConsentGateProps {
  */
 declare function ConsentGate({ service, children, placeholder, aspectRatio, className }: ConsentGateProps): react.JSX.Element;
 
-export { ConsentGate, type ConsentGateProps, ConsentProvider, type ConsentProviderProps, CookieSettingsLink, type CookieSettingsLinkProps, PageViews, type UseConsentResult, useConsent, useConsentContext, usePageViews };
+export { ConsentGate, type ConsentGateProps, ConsentProvider, type ConsentProviderProps, CookieSettingsLink, type CookieSettingsLinkProps, PageViews, type UseConsentResult, useConsent, useConsentConfig, useConsentContext, usePageViews };

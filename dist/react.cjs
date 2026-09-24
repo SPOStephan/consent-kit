@@ -2,6 +2,7 @@
 
 var react = require('react');
 var consentKit = require('consent-kit');
+var remote = require('consent-kit/remote');
 var jsxRuntime = require('react/jsx-runtime');
 
 // src/react/index.tsx
@@ -33,11 +34,33 @@ var serverSnapshot = {
   },
   ready: false
 };
-function ConsentProvider({ config, children }) {
+function ConsentProvider({ config: localConfig, remote: remote$1, children }) {
+  const [remoteConfig, setRemoteConfig] = react.useState(null);
+  const remoteKey = remote$1 ? `${remote$1.endpoint}|${remote$1.siteId}` : "";
+  const remoteRef = react.useRef(remote$1);
+  remoteRef.current = remote$1;
   react.useEffect(() => {
-    consentKit.init(config);
+    const options = remoteRef.current;
+    if (!options) return;
+    let cancelled = false;
+    remote.loadRemoteConfig(options).then(
+      (loaded) => {
+        if (!cancelled) setRemoteConfig(loaded);
+      },
+      (error) => {
+        if (typeof console !== "undefined") console.error(error);
+      }
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [remoteKey]);
+  const config = localConfig ?? remoteConfig;
+  react.useEffect(() => {
+    if (config) consentKit.init(config);
   }, [config]);
   const value = react.useMemo(() => {
+    if (!config) return { config: null, language: "de", texts: consentKit.defaultTexts.de };
     const language = consentKit.resolveLanguage(config);
     return { config, language, texts: consentKit.resolveTexts(config, language) };
   }, [config]);
@@ -47,6 +70,9 @@ function useConsentContext() {
   const ctx = react.useContext(ConsentContext);
   if (!ctx) throw new Error("consent-kit: useConsent() muss innerhalb von <ConsentProvider> verwendet werden.");
   return ctx;
+}
+function useConsentConfig() {
+  return useConsentContext().config;
 }
 function useConsent() {
   const { state, ready } = react.useSyncExternalStore(subscribe, readSnapshot, () => serverSnapshot);
@@ -101,7 +127,7 @@ function ConsentGate({ service, children, placeholder, aspectRatio, className })
   const load = react.useCallback(() => setService(service, true), [service, setService]);
   if (hasConsent(service)) return /* @__PURE__ */ jsxRuntime.jsx(jsxRuntime.Fragment, { children: typeof children === "function" ? children() : children });
   if (placeholder !== void 0) return /* @__PURE__ */ jsxRuntime.jsx(jsxRuntime.Fragment, { children: typeof placeholder === "function" ? placeholder(load) : placeholder });
-  const plugin = config.services.find((p) => p.id === service);
+  const plugin = config?.services.find((p) => p.id === service);
   const name = plugin?.meta.name ?? service;
   const third = plugin?.meta.thirdCountryTransfer?.[language];
   const thirdText = third ? language === "de" ? `, ggf. auch in Drittl\xE4nder (${third})` : `, possibly also to third countries (${third})` : "";
@@ -109,7 +135,7 @@ function ConsentGate({ service, children, placeholder, aspectRatio, className })
     "div",
     {
       className: ["ck-gate", className].filter(Boolean).join(" "),
-      "data-ck-scheme": config.ui?.colorScheme ?? "auto",
+      "data-ck-scheme": config?.ui?.colorScheme ?? "auto",
       style: aspectRatio ? { aspectRatio } : void 0,
       role: "group",
       "aria-label": `${texts.gateTitle}: ${name}`,
@@ -138,5 +164,6 @@ exports.ConsentProvider = ConsentProvider;
 exports.CookieSettingsLink = CookieSettingsLink;
 exports.PageViews = PageViews;
 exports.useConsent = useConsent;
+exports.useConsentConfig = useConsentConfig;
 exports.useConsentContext = useConsentContext;
 exports.usePageViews = usePageViews;

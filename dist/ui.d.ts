@@ -30,6 +30,6 @@ interface ConsentUIProps {
  * (über openSettings() bzw. den Footer-Link). Muss innerhalb von <ConsentProvider> stehen.
  * CSS einbinden: import 'consent-kit/ui.css'
  */
-declare function ConsentUI({ owner }?: ConsentUIProps): react.ReactPortal | null;
+declare function ConsentUI({ owner }?: ConsentUIProps): react.JSX.Element | null;
 
 export { ConsentBanner, type ConsentBannerProps, ConsentSettings, type ConsentSettingsProps, ConsentUI, type ConsentUIProps, buildThemeCss };

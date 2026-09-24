@@ -428,7 +428,8 @@ var ConsentManager = class {
       categories: s.categories,
       services: s.services,
       gpc: s.gpc,
-      domain: location.hostname
+      domain: location.hostname,
+      ...this.config?.logging?.siteId ? { siteId: this.config.logging.siteId } : {}
     });
     fetch(endpoint, {
       method: "POST",
@@ -613,7 +614,7 @@ function resolveTexts(config, language = resolveLanguage(config)) {
 function formatText(template, values) {
   return template.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? "");
 }
-function consentCookieMeta(config, owner = "") {
+function consentCookieMeta(config, owner = config.owner ?? "") {
   const days = Math.min(config.cookie?.maxAgeDays ?? 365, 365);
   const duration = days === 365 ? { de: "12 Monate", en: "12 months" } : { de: `${days} Tage`, en: `${days} days` };
   return {

@@ -18,6 +18,7 @@ export default defineConfig(({ command }) => {
         { find: /^consent-kit\/react$/, replacement: dev ? r('../src/react/index.tsx') : r('../dist/react.js') },
         { find: /^consent-kit\/ui$/, replacement: dev ? r('../src/ui/index.tsx') : r('../dist/ui.js') },
         { find: /^consent-kit\/table$/, replacement: dev ? r('../src/table/index.ts') : r('../dist/table.js') },
+        { find: /^consent-kit\/remote$/, replacement: dev ? r('../src/remote/index.ts') : r('../dist/remote.js') },
         { find: /^consent-kit$/, replacement: dev ? r('../src/index.ts') : r('../dist/index.js') },
       ],
     },

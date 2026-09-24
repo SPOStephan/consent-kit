@@ -7,6 +7,7 @@ const entries: Record<string, string> = { index: 'src/index.ts' };
 if (existsSync('src/react/index.tsx')) entries.react = 'src/react/index.tsx';
 if (existsSync('src/ui/index.tsx')) entries.ui = 'src/ui/index.tsx';
 if (existsSync('src/table/index.ts')) entries.table = 'src/table/index.ts';
+if (existsSync('src/remote/index.ts')) entries.remote = 'src/remote/index.ts';
 
 export default defineConfig([
   {

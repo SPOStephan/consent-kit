@@ -9,6 +9,7 @@ export default defineConfig({
       { find: /^consent-kit\/react$/, replacement: r('./src/react/index.tsx') },
       { find: /^consent-kit\/ui$/, replacement: r('./src/ui/index.tsx') },
       { find: /^consent-kit\/table$/, replacement: r('./src/table/index.ts') },
+      { find: /^consent-kit\/remote$/, replacement: r('./src/remote/index.ts') },
       { find: /^consent-kit$/, replacement: r('./src/index.ts') },
     ],
   },
