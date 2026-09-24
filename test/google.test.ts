@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { googleTagManager } from '../src/plugins/google';
+import { resetScriptRegistry } from '../src/core/scripts';
 import { baseConfig, newManager, resetDom } from './helpers';
 
 type DL = unknown[];
@@ -73,16 +74,17 @@ describe('Google Tag Manager + Consent Mode v2', () => {
   });
 
   it('bei gespeicherter Einwilligung: Default → Update → gtm.js', () => {
-    const config = baseConfig([googleTagManager({ id: 'GTM-TEST123' })]);
+    const config = () => baseConfig([googleTagManager({ id: 'GTM-TEST123' })]);
     const first = newManager();
-    first.init(config);
+    first.init(config());
     first.acceptAll();
     // frischer Seitenaufruf
     delete (window as unknown as Record<string, unknown>).dataLayer;
     delete (window as unknown as Record<string, unknown>).__consentKitDefaults_dataLayer;
+    resetScriptRegistry();
     document.head.innerHTML = '';
     const m = newManager();
-    expect(m.init(config).decided).toBe(true);
+    expect(m.init(config()).decided).toBe(true);
     const e = entries();
     expect(gtmScripts().length).toBe(1);
     expect((e[0] as unknown[])[1]).toBe('default');
