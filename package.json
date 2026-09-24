@@ -59,6 +59,7 @@
   },
   "files": [
     "dist",
+    "docs",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"
@@ -108,5 +109,23 @@
     "typescript": "^5.9.3",
     "vite": "^7.3.6",
     "vitest": "^3.2.7"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SPOStephan/consent-kit.git"
+  },
+  "homepage": "https://github.com/SPOStephan/consent-kit#readme",
+  "keywords": [
+    "consent",
+    "cookie-banner",
+    "gdpr",
+    "dsgvo",
+    "tdddg",
+    "consent-mode",
+    "google-tag-manager",
+    "meta-pixel",
+    "tiktok-pixel",
+    "react",
+    "vite"
+  ]
 }
