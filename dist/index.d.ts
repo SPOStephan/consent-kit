@@ -131,6 +131,7 @@ interface Texts {
     privacyPolicy: string;
     allowService: string;
     gpcNotice: string;
+    consentIdLabel: string;
     gateTitle: string;
     gateDescription: string;
     gateLoad: string;

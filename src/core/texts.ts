@@ -43,6 +43,7 @@ export const defaultTexts: Record<Language, Texts> = {
     allowService: 'Diesen Dienst erlauben',
     gpcNotice:
       'Ihr Browser sendet das Signal „Global Privacy Control“. Marketing-Dienste werden daher nicht automatisch aktiviert.',
+    consentIdLabel: 'Ihre Einwilligungs-ID (für Rückfragen)',
     gateTitle: 'Externer Inhalt',
     gateDescription:
       'Hier wird ein Inhalt von {service} ({provider}) angezeigt. Beim Laden werden Daten an den Anbieter übermittelt{thirdCountry}.',
@@ -98,6 +99,7 @@ export const defaultTexts: Record<Language, Texts> = {
     allowService: 'Allow this service',
     gpcNotice:
       'Your browser sends the “Global Privacy Control” signal. Marketing services are therefore not activated automatically.',
+    consentIdLabel: 'Your consent ID (for enquiries)',
     gateTitle: 'External content',
     gateDescription:
       'This area shows content from {service} ({provider}). When loading it, data is transferred to the provider{thirdCountry}.',

@@ -302,7 +302,12 @@ function ConsentSettings({ onClose, owner }) {
                 ] })
               ] }, id);
             }) }),
-            /* @__PURE__ */ jsxRuntime.jsx(Links, { config, texts })
+            /* @__PURE__ */ jsxRuntime.jsx(Links, { config, texts }),
+            state.consentId ? /* @__PURE__ */ jsxRuntime.jsxs("p", { className: "ck-consent-id", children: [
+              texts.consentIdLabel,
+              ": ",
+              /* @__PURE__ */ jsxRuntime.jsx("code", { "data-testid": "consent-id", children: state.consentId })
+            ] }) : null
           ] }),
           /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "ck-actions ck-dialog__footer", children: [
             /* @__PURE__ */ jsxRuntime.jsx("button", { type: "button", className: "ck-btn", onClick: () => finish(rejectAll), children: texts.rejectAll }),

@@ -394,6 +394,11 @@ export function ConsentSettings({ onClose, owner }: ConsentSettingsProps) {
             })}
           </ul>
           <Links config={config} texts={texts} />
+          {state.consentId ? (
+            <p className="ck-consent-id">
+              {texts.consentIdLabel}: <code data-testid="consent-id">{state.consentId}</code>
+            </p>
+          ) : null}
         </div>
         <div className="ck-actions ck-dialog__footer">
           <button type="button" className="ck-btn" onClick={() => finish(rejectAll)}>

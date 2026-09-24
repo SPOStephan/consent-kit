@@ -13,13 +13,13 @@ Tipp: Den Großteil kann eine KI für Sie erledigen – siehe
 Im Ordner Ihrer Website (dort, wo die `package.json` liegt):
 
 ```bash
-npm install github:SPOStephan/consent-kit#v0.1.0
+npm install github:SPOStephan/consent-kit#v0.2.0
 ```
 
 In der `package.json` steht danach:
 
 ```json
-"consent-kit": "github:SPOStephan/consent-kit#v0.1.0"
+"consent-kit": "github:SPOStephan/consent-kit#v0.2.0"
 ```
 
 Ist das Repository privat, lesen Sie zuerst [INSTALLATION.md](INSTALLATION.md).
@@ -228,7 +228,7 @@ GTM nutzen.
 ## Updates
 
 ```bash
-npm install github:SPOStephan/consent-kit#v0.2.0
+npm install github:SPOStephan/consent-kit#v0.3.0
 ```
 
 Lesen Sie vorher das [CHANGELOG](../CHANGELOG.md). Wenn sich Ihre Dienste ändern, erhöhen Sie

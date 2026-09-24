@@ -5,6 +5,15 @@ Alle wichtigen Änderungen an consent-kit. Versionen folgen [Semantic Versioning
 
 Installation einer bestimmten Version: `npm install github:SPOStephan/consent-kit#vX.Y.Z`
 
+## [0.2.0] – 2026-09-24
+
+### Neu
+- Protokollierungs-Worker (`worker/`, nicht Teil des npm-Pakets): Cloudflare Worker + D1,
+  speichert Entscheidungen ohne IP-Adresse und User-Agent, CORS nur für eigene Domains,
+  Rate-Limiting, geschützte Abfrage per Consent-ID, automatische Löschung nach 3 Jahren.
+  Anleitung: [docs/WORKER.md](docs/WORKER.md).
+- Einstellungsdialog zeigt die Einwilligungs-ID des Besuchers (für Rückfragen und Nachweis).
+
 ## [0.1.0] – 2026-09-24
 
 Erste Version.

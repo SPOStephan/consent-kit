@@ -33,11 +33,11 @@ wie **YouTube** und **Google Maps** – und lädt sie erst, **nachdem** Besucher
 ## Installation
 
 ```bash
-npm install github:SPOStephan/consent-kit#v0.1.0
+npm install github:SPOStephan/consent-kit#v0.2.0
 ```
 
 Die Version steht hinter dem `#`. Für ein Update einfach die neue Version installieren,
-z. B. `npm install github:SPOStephan/consent-kit#v0.2.0` (siehe [CHANGELOG](CHANGELOG.md)).
+z. B. `npm install github:SPOStephan/consent-kit#v0.3.0` (siehe [CHANGELOG](CHANGELOG.md)).
 Getestet mit npm und pnpm – das Paket ist bereits fertig gebaut, bei der Installation läuft
 kein Build-Schritt.
 
@@ -178,8 +178,10 @@ npx consent-kit table src/consent.config.ts --owner="Meine Firma GmbH"
   werden daher ggf. häufiger gefragt. Das ist eine Browser-Einschränkung.
 - **Externe Ressourcen:** Google Fonts, CDNs usw. übertragen ebenfalls IP-Adressen. Binden Sie
   Schriften lokal ein – `npx consent-kit check` zeigt solche Requests an.
-- **Protokollierung:** Mit `logging.endpoint` wird jede Entscheidung (Consent-ID, Zeitstempel,
-  Version, Kategorien, Domain – **ohne** IP-Adresse und User-Agent) an Ihren Endpunkt gesendet.
+- **Protokollierung (Nachweis):** Mit `logging.endpoint` wird jede Entscheidung (Consent-ID,
+  Zeitstempel, Version, Kategorien, Domain – **ohne** IP-Adresse und User-Agent) an Ihren
+  Endpunkt gesendet. Ein fertiger Cloudflare Worker liegt in `worker/` – Einrichtung Schritt für
+  Schritt in [docs/WORKER.md](docs/WORKER.md).
 
 ## Entwicklung
 
@@ -191,9 +193,10 @@ npm run build       # baut dist/ (wird mit eingecheckt, damit die Git-Installati
 ```
 
 Ordner: `src/` (Paket), `demo/` (Demo-Seite), `e2e/` (Playwright-Tests), `test/` (Unit-Tests),
-`docs/` (Dokumentation).
+`worker/` (Cloudflare Worker für die Protokollierung), `docs/` (Dokumentation).
 
 **Neue Version veröffentlichen:** Version in `package.json` erhöhen, `npm run build && npm test`,
-CHANGELOG ergänzen, committen, Git-Tag setzen (`git tag v0.2.0 && git push --tags`).
+CHANGELOG ergänzen, committen und pushen. Dann auf GitHub → **Releases** → **Draft a new release**
+→ Tag `vX.Y.Z` neu anlegen → **Publish release**.
 
 Lizenz: MIT

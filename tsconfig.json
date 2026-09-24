@@ -23,5 +23,5 @@
       "consent-kit/table": ["./src/table/index.ts"]
     }
   },
-  "include": ["src", "test", "e2e", "demo", "playwright.config.ts", "vitest.config.ts", "tsup.config.ts"]
+  "include": ["src", "test", "e2e", "demo", "worker/src", "worker/test", "playwright.config.ts", "vitest.config.ts", "tsup.config.ts"]
 }

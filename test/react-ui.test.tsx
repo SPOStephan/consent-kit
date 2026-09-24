@@ -139,6 +139,8 @@ describe('Einstellungsdialog', () => {
     link.focus();
     fireEvent.click(link);
     const dialog = screen.getByRole('dialog');
+    // Consent-ID wird für Rückfragen angezeigt
+    expect(within(dialog).getByTestId('consent-id').textContent).toBe(getManager().getState().consentId);
     // Einstellungen spiegeln die Entscheidung wider
     expect((within(dialog).getByTestId('category-marketing') as HTMLInputElement).checked).toBe(true);
     expect(dialog.contains(document.activeElement)).toBe(true);

@@ -1,0 +1,3 @@
+# Für lokales Testen mit `npm run dev`: Datei nach .dev.vars kopieren (wird nicht committet).
+ADMIN_TOKEN=lokales-test-token-mindestens-20-zeichen
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:4173

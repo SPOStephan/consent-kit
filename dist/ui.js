@@ -300,7 +300,12 @@ function ConsentSettings({ onClose, owner }) {
                 ] })
               ] }, id);
             }) }),
-            /* @__PURE__ */ jsx(Links, { config, texts })
+            /* @__PURE__ */ jsx(Links, { config, texts }),
+            state.consentId ? /* @__PURE__ */ jsxs("p", { className: "ck-consent-id", children: [
+              texts.consentIdLabel,
+              ": ",
+              /* @__PURE__ */ jsx("code", { "data-testid": "consent-id", children: state.consentId })
+            ] }) : null
           ] }),
           /* @__PURE__ */ jsxs("div", { className: "ck-actions ck-dialog__footer", children: [
             /* @__PURE__ */ jsx("button", { type: "button", className: "ck-btn", onClick: () => finish(rejectAll), children: texts.rejectAll }),

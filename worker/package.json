@@ -1,0 +1,15 @@
+{
+  "name": "consent-kit-worker",
+  "private": true,
+  "type": "module",
+  "description": "Protokollierung von Einwilligungen (Nachweis) für consent-kit – Cloudflare Worker + D1",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:init": "wrangler d1 execute consent-log --remote --file=schema.sql",
+    "db:init:local": "wrangler d1 execute consent-log --local --file=schema.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^4.40.0"
+  }
+}
