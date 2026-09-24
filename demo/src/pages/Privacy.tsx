@@ -1,8 +1,10 @@
 import { getServiceRows } from 'consent-kit/table';
-import { consentConfig } from '../consent.config';
+import { useConsentConfig } from 'consent-kit/react';
 
 export function Privacy() {
-  const rows = getServiceRows(consentConfig, { owner: 'Muster GmbH (Demo)' });
+  // Aktive Konfiguration – funktioniert mit consent.config.ts und mit Einstellungen aus dem Backend.
+  const config = useConsentConfig();
+  const rows = config ? getServiceRows(config, { owner: config.owner ?? 'Muster GmbH (Demo)' }) : [];
   return (
     <article>
       <h1>Datenschutzerklärung</h1>

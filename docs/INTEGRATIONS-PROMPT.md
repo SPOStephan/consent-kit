@@ -1,9 +1,13 @@
 # Integrations-Prompt für Cursor, Manus oder Claude Code
 
+> **Mit Backend?** Verwenden Sie stattdessen den Prompt aus der Admin-Oberfläche (Reiter
+> **Einbau**) – er enthält bereits alle IDs und Einstellungen Ihrer Website. Dieser Prompt hier
+> ist für den Betrieb **ohne** Backend (mit `consent.config.ts`).
+
 Kopieren Sie den folgenden Text **komplett** in die KI Ihres Website-Projekts. Die KI baut
 consent-kit ein, entfernt alte Tracking-Codes und prüft am Ende das Ergebnis.
 
-Vorher anpassen: die Versionsnummer (`v0.2.0`), falls es eine neuere gibt – siehe
+Vorher anpassen: die Versionsnummer (`v0.3.0`), falls es eine neuere gibt – siehe
 [CHANGELOG](../CHANGELOG.md).
 
 ---
@@ -19,8 +23,8 @@ Dokumentation des Pakets (nach der Installation lokal verfügbar):
 node_modules/consent-kit/README.md und node_modules/consent-kit/docs/ (INTEGRATION.md, GTM.md)
 
 A) INSTALLIEREN
-   - Führe aus: npm install github:SPOStephan/consent-kit#v0.2.0
-     (bei pnpm: pnpm add github:SPOStephan/consent-kit#v0.2.0)
+   - Führe aus: npm install github:SPOStephan/consent-kit#v0.3.0
+     (bei pnpm: pnpm add github:SPOStephan/consent-kit#v0.3.0)
    - Prüfe, dass in package.json "consent-kit" mit genau dieser Version steht.
 
 B) KONFIGURATION ANLEGEN: src/consent.config.ts

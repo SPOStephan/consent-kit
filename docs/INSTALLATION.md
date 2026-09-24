@@ -3,8 +3,8 @@
 ## Standard: Installation per Git-URL
 
 ```bash
-npm install github:SPOStephan/consent-kit#v0.2.0
-# pnpm:  pnpm add github:SPOStephan/consent-kit#v0.2.0
+npm install github:SPOStephan/consent-kit#v0.3.0
+# pnpm:  pnpm add github:SPOStephan/consent-kit#v0.3.0
 ```
 
 - Das Paket liegt im Repository **fertig gebaut** (`dist/`). Bei der Installation läuft kein
@@ -12,10 +12,10 @@ npm install github:SPOStephan/consent-kit#v0.2.0
   Build-Skripte von Abhängigkeiten standardmäßig blockiert).
 - In Ihr Projekt gelangen nur `dist/`, `docs/`, `README.md`, `CHANGELOG.md`, `LICENSE` und
   `package.json` – nicht die Demo, Tests oder der Worker.
-- `#v0.2.0` ist ein Git-Tag. Ohne Tag (`#main`) bekämen Sie immer den neuesten Stand – das ist
+- `#v0.3.0` ist ein Git-Tag. Ohne Tag (`#main`) bekämen Sie immer den neuesten Stand – das ist
   für Live-Websites **nicht** zu empfehlen.
 
-**Update:** `npm install github:SPOStephan/consent-kit#v0.3.0` – vorher das CHANGELOG lesen.
+**Update:** `npm install github:SPOStephan/consent-kit#v0.4.0` – vorher das CHANGELOG lesen.
 
 Getestet (v0.1.0): frisches Vite-8-Projekt mit React 19 und TypeScript 6 über
 `npm install github:…`, `pnpm add github:…`, Build, `npx consent-kit table` und
@@ -44,7 +44,7 @@ Die Lizenz steht in `LICENSE` (derzeit MIT – bei Bedarf anpassen).
    **Fine-grained tokens** → „Generate new token“: nur Repository `consent-kit`,
    Berechtigung **Contents: Read-only**, Ablaufdatum setzen.
 2. In `package.json` Ihrer Website die HTTPS-Form verwenden:
-   `"consent-kit": "git+https://github.com/SPOStephan/consent-kit.git#v0.2.0"`
+   `"consent-kit": "git+https://github.com/SPOStephan/consent-kit.git#v0.3.0"`
 3. Auf der Plattform eine Umgebungsvariable `GITHUB_TOKEN` mit dem Token anlegen und den
    Installationsbefehl ändern:
 
@@ -80,9 +80,9 @@ eingerichtet.)**
 
 ```bash
 # im consent-kit-Ordner
-npm pack                      # erzeugt consent-kit-0.2.0.tgz
+npm pack                      # erzeugt consent-kit-0.3.0.tgz
 # Datei nach <website>/vendor/ kopieren, dann in der Website:
-npm install ./vendor/consent-kit-0.2.0.tgz
+npm install ./vendor/consent-kit-0.3.0.tgz
 ```
 
 Funktioniert überall ohne Token (die Datei liegt ja im Website-Repository). Nachteil: Updates

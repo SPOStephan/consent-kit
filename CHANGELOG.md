@@ -5,13 +5,32 @@ Alle wichtigen Änderungen an consent-kit. Versionen folgen [Semantic Versioning
 
 Installation einer bestimmten Version: `npm install github:SPOStephan/consent-kit#vX.Y.Z`
 
+## [0.3.0] – 2026-09-24
+
+### Neu
+- **Backend mit Admin-Oberfläche** (`worker/`, Cloudflare Worker + D1): Websites mit Domains,
+  Diensten, IDs, Links, Farben und Texten verwalten; Einbau-Code und vorausgefüllter
+  KI-Prompt pro Website; Datenschutz-Tabelle; Nachweis-Suche; Statistik.
+  Schutz über Cloudflare Access (Signatur wird im Backend selbst geprüft), Notfall-Token,
+  CSRF-Schutz, strenge Content-Security-Policy. Anleitung: [docs/BACKEND.md](docs/BACKEND.md).
+- **Zentrale Einstellungen:** `<ConsentProvider remote={{ endpoint, siteId, fallback }}>` lädt
+  die Einstellungen live vom Backend; ohne Backend und ohne Rückfallebene lädt kein Dienst.
+- Neuer Unterpfad `consent-kit/remote` (`loadRemoteConfig`, `fromRemoteConfig`).
+- `useConsentConfig()`, `config.owner`; die Protokollierung sendet die Website-Kennung mit.
+- Ändern sich die Dienste im Admin, wird die Version automatisch erhöht (neue Abfrage).
+
+### Geändert
+- Protokollierung: Freigegebene Domains kommen aus der Admin-Oberfläche
+  (`ALLOWED_ORIGINS` gilt zusätzlich). Datenbank über Migrationen (`npm run db:migrate`).
+- `useConsentContext().config` kann `null` sein, solange Einstellungen geladen werden.
+
 ## [0.2.0] – 2026-09-24
 
 ### Neu
 - Protokollierungs-Worker (`worker/`, nicht Teil des npm-Pakets): Cloudflare Worker + D1,
   speichert Entscheidungen ohne IP-Adresse und User-Agent, CORS nur für eigene Domains,
   Rate-Limiting, geschützte Abfrage per Consent-ID, automatische Löschung nach 3 Jahren.
-  Anleitung: [docs/WORKER.md](docs/WORKER.md).
+  Anleitung: [docs/BACKEND.md](docs/BACKEND.md).
 - Einstellungsdialog zeigt die Einwilligungs-ID des Besuchers (für Rückfragen und Nachweis).
 
 ## [0.1.0] – 2026-09-24

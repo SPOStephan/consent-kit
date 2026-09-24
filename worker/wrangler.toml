@@ -1,24 +1,28 @@
-# Cloudflare-Konfiguration des consent-kit Protokollierungs-Workers.
-# Anleitung: docs/WORKER.md
-name = "consent-log"
+# Cloudflare-Konfiguration des consent-kit Backends.
+# Anleitung: docs/BACKEND.md
+name = "consent-kit"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
 
-# Alte Einträge einmal täglich löschen (siehe RETENTION_DAYS)
+# Alte Protokoll-Einträge einmal täglich löschen (siehe RETENTION_DAYS)
 [triggers]
 crons = ["17 3 * * *"]
 
 [vars]
-# Ihre Domains – GENAU so, wie sie im Browser stehen (mit https://, ohne / am Ende)
-ALLOWED_ORIGINS = "https://meine-seite.de,https://www.meine-seite.de"
-# Aufbewahrungsdauer in Tagen (3 Jahre)
+# Cloudflare Access (Schutz der Admin-Oberfläche) – siehe docs/BACKEND.md, Schritt 9
+ACCESS_TEAM_DOMAIN = ""   # z. B. "meinteam.cloudflareaccess.com"
+ACCESS_AUD = ""           # "Application Audience (AUD) Tag" der Access-Anwendung
+# Aufbewahrungsdauer des Protokolls in Tagen (3 Jahre)
 RETENTION_DAYS = "1095"
+# Optional: öffentliche Adresse, falls abweichend von der aufgerufenen, z. B. "https://consent.meine-firma.de"
+# PUBLIC_URL = ""
 
 [[d1_databases]]
 binding = "DB"
-database_name = "consent-log"
-# Hier die ID eintragen, die `npx wrangler d1 create consent-log` ausgibt:
+database_name = "consent-kit"
+# Hier die ID eintragen, die `npx wrangler d1 create consent-kit` ausgibt:
 database_id = "HIER-DATABASE-ID-EINTRAGEN"
+migrations_dir = "migrations"
 
 # Rate-Limiting: max. 20 Protokoll-Einträge pro Minute und IP-Adresse
 [[ratelimits]]
@@ -26,5 +30,9 @@ name = "RATE_LIMITER"
 namespace_id = "1001"
 simple = { limit = 20, period = 60 }
 
-# ADMIN_TOKEN ist ein Geheimnis und steht NICHT hier, sondern wird gesetzt mit:
+# Wrangler bündelt das Backend zusammen mit den Quelltexten des Pakets.
+[alias]
+"consent-kit" = "../src/index.ts"
+
+# ADMIN_TOKEN (Notfall-Zugang) ist ein Geheimnis und steht NICHT hier, sondern wird gesetzt mit:
 #   npx wrangler secret put ADMIN_TOKEN

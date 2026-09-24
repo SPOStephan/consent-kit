@@ -1,13 +1,13 @@
 {
-  "name": "consent-kit-worker",
+  "name": "consent-kit-backend",
   "private": true,
   "type": "module",
-  "description": "Protokollierung von Einwilligungen (Nachweis) für consent-kit – Cloudflare Worker + D1",
+  "description": "consent-kit Backend: Verwaltung der Websites, zentrale Einstellungen, Protokollierung – Cloudflare Worker + D1",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "db:init": "wrangler d1 execute consent-log --remote --file=schema.sql",
-    "db:init:local": "wrangler d1 execute consent-log --local --file=schema.sql"
+    "db:migrate": "wrangler d1 migrations apply consent-kit --remote",
+    "db:migrate:local": "wrangler d1 migrations apply consent-kit --local"
   },
   "devDependencies": {
     "wrangler": "^4.40.0"

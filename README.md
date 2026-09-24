@@ -33,11 +33,11 @@ wie **YouTube** und **Google Maps** – und lädt sie erst, **nachdem** Besucher
 ## Installation
 
 ```bash
-npm install github:SPOStephan/consent-kit#v0.2.0
+npm install github:SPOStephan/consent-kit#v0.3.0
 ```
 
 Die Version steht hinter dem `#`. Für ein Update einfach die neue Version installieren,
-z. B. `npm install github:SPOStephan/consent-kit#v0.3.0` (siehe [CHANGELOG](CHANGELOG.md)).
+z. B. `npm install github:SPOStephan/consent-kit#v0.4.0` (siehe [CHANGELOG](CHANGELOG.md)).
 Getestet mit npm und pnpm – das Paket ist bereits fertig gebaut, bei der Installation läuft
 kein Build-Schritt.
 
@@ -108,6 +108,28 @@ Die vollständige Schritt-für-Schritt-Anleitung steht in [docs/INTEGRATION.md](
 Noch schneller: Kopieren Sie [docs/INTEGRATIONS-PROMPT.md](docs/INTEGRATIONS-PROMPT.md) in
 Cursor, Manus oder Claude Code.
 
+## Zentrale Verwaltung mit Backend (empfohlen bei mehreren Websites)
+
+Statt einer `consent.config.ts` pro Website können Sie alle Websites in einer
+**Admin-Oberfläche** verwalten (Cloudflare Worker, kostenloser Tarif): Domains, IDs, Dienste,
+Texte und Farben eintragen, fertigen Einbau-Code und KI-Prompt abrufen, Nachweise suchen,
+Statistiken sehen. Die Websites laden ihre Einstellungen live – Änderungen wirken ohne neues
+Veröffentlichen der Website:
+
+```tsx
+// src/consent.remote.ts – wird von der Admin-Oberfläche erzeugt
+export const consentRemote: RemoteOptions = {
+  endpoint: 'https://consent.ihre-firma.de',
+  siteId: 'meine-seite',
+  fallback: { /* Sicherheitskopie der Einstellungen */ },
+};
+
+// src/main.tsx
+<ConsentProvider remote={consentRemote}>…</ConsentProvider>
+```
+
+Einrichtung Schritt für Schritt: [docs/BACKEND.md](docs/BACKEND.md).
+
 ## Pakete (Unterpfade)
 
 | Import | Inhalt |
@@ -117,6 +139,7 @@ Cursor, Manus oder Claude Code.
 | `consent-kit/ui` | Fertiges Banner und Einstellungsdialog: `<ConsentUI />` |
 | `consent-kit/ui.css` | Standard-Styles (CSS-Variablen, Dark Mode) |
 | `consent-kit/table` | Dienste-Tabelle für die Datenschutzerklärung (`toMarkdown`, `toHtml`, `getServiceRows`) |
+| `consent-kit/remote` | Einstellungen aus dem Backend laden (`loadRemoteConfig`, `fromRemoteConfig`) |
 
 ## Mitgelieferte Dienste
 
@@ -180,8 +203,8 @@ npx consent-kit table src/consent.config.ts --owner="Meine Firma GmbH"
   Schriften lokal ein – `npx consent-kit check` zeigt solche Requests an.
 - **Protokollierung (Nachweis):** Mit `logging.endpoint` wird jede Entscheidung (Consent-ID,
   Zeitstempel, Version, Kategorien, Domain – **ohne** IP-Adresse und User-Agent) an Ihren
-  Endpunkt gesendet. Ein fertiger Cloudflare Worker liegt in `worker/` – Einrichtung Schritt für
-  Schritt in [docs/WORKER.md](docs/WORKER.md).
+  Endpunkt gesendet. Das fertige Backend liegt in `worker/` – Einrichtung Schritt für
+  Schritt in [docs/BACKEND.md](docs/BACKEND.md).
 
 ## Entwicklung
 
@@ -193,7 +216,7 @@ npm run build       # baut dist/ (wird mit eingecheckt, damit die Git-Installati
 ```
 
 Ordner: `src/` (Paket), `demo/` (Demo-Seite), `e2e/` (Playwright-Tests), `test/` (Unit-Tests),
-`worker/` (Cloudflare Worker für die Protokollierung), `docs/` (Dokumentation).
+`worker/` (Backend: Admin-Oberfläche, zentrale Einstellungen, Protokollierung), `docs/` (Dokumentation).
 
 **Neue Version veröffentlichen:** Version in `package.json` erhöhen, `npm run build && npm test`,
 CHANGELOG ergänzen, committen und pushen. Dann auf GitHub → **Releases** → **Draft a new release**

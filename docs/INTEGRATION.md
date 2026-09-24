@@ -6,6 +6,12 @@ Tipp: Den Großteil kann eine KI für Sie erledigen – siehe
 
 > Alle Texte des Kits sind **Mustertexte – rechtlich prüfen lassen**.
 
+> **Sie nutzen das consent-kit Backend?** Dann brauchen Sie diese Anleitung nicht im Detail:
+> Legen Sie die Website in der Admin-Oberfläche an und kopieren Sie unter **Einbau** den
+> fertigen KI-Prompt bzw. Code (statt `consent.config.ts` gibt es dann eine
+> `consent.remote.ts`). Siehe [BACKEND.md](BACKEND.md). Diese Anleitung beschreibt den Betrieb
+> **ohne** Backend.
+
 ---
 
 ## Schritt 1: Paket installieren
@@ -13,13 +19,13 @@ Tipp: Den Großteil kann eine KI für Sie erledigen – siehe
 Im Ordner Ihrer Website (dort, wo die `package.json` liegt):
 
 ```bash
-npm install github:SPOStephan/consent-kit#v0.2.0
+npm install github:SPOStephan/consent-kit#v0.3.0
 ```
 
 In der `package.json` steht danach:
 
 ```json
-"consent-kit": "github:SPOStephan/consent-kit#v0.2.0"
+"consent-kit": "github:SPOStephan/consent-kit#v0.3.0"
 ```
 
 Ist das Repository privat, lesen Sie zuerst [INSTALLATION.md](INSTALLATION.md).
@@ -228,7 +234,7 @@ GTM nutzen.
 ## Updates
 
 ```bash
-npm install github:SPOStephan/consent-kit#v0.3.0
+npm install github:SPOStephan/consent-kit#v0.4.0
 ```
 
 Lesen Sie vorher das [CHANGELOG](../CHANGELOG.md). Wenn sich Ihre Dienste ändern, erhöhen Sie

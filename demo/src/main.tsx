@@ -6,11 +6,15 @@ import { ConsentUI } from 'consent-kit/ui';
 import 'consent-kit/ui.css';
 import './demo.css';
 import { consentConfig } from './consent.config';
+import type { RemoteOptions } from 'consent-kit/remote';
+
+// Nur für die automatischen Tests: Einstellungen aus einem (simulierten) Backend laden.
+const testRemote = (globalThis as { __DEMO_REMOTE__?: RemoteOptions }).__DEMO_REMOTE__;
 import { App } from './App';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ConsentProvider config={consentConfig}>
+    <ConsentProvider {...(testRemote ? { remote: testRemote } : { config: consentConfig })}>
       <BrowserRouter>
         <App />
       </BrowserRouter>
