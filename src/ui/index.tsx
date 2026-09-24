@@ -29,22 +29,30 @@ const THEME_VARS: Record<keyof ThemeVariables, string> = {
   zIndex: '--ck-z',
 };
 
-function themeCss(theme: ThemeVariables | undefined): string {
+const COLOR_KEYS = new Set<keyof ThemeVariables>(['background', 'text', 'accent', 'buttonBackground', 'buttonText', 'border']);
+
+function themeCss(theme: ThemeVariables | undefined, colors: boolean): string {
   if (!theme) return '';
   return Object.entries(theme)
-    .filter(([key, value]) => value && key in THEME_VARS)
+    .filter(([key, value]) => value && key in THEME_VARS && COLOR_KEYS.has(key as keyof ThemeVariables) === colors)
     .map(([key, value]) => `${THEME_VARS[key as keyof ThemeVariables]}:${String(value).replace(/[;{}<>]/g, '')};`)
     .join('');
 }
 
-function buildStyle(config: ConsentConfig): string {
-  const light = themeCss(config.ui?.theme);
-  const dark = themeCss(config.ui?.darkTheme);
-  let css = light ? `.ck-root{${light}}` : '';
-  if (dark) {
-    css += `.ck-root[data-ck-scheme="dark"]{${dark}}`;
-    css += `@media (prefers-color-scheme: dark){.ck-root[data-ck-scheme="auto"]{${dark}}}`;
-  }
+/**
+ * Erzeugt CSS aus ui.theme / ui.darkTheme.
+ * Farben aus `theme` gelten nur im hellen Schema, Farben aus `darkTheme` nur im
+ * dunklen – so bleiben die kontrastreichen Dark-Mode-Standardwerte erhalten,
+ * wenn nur `theme` gesetzt ist. Maße und Schrift gelten immer.
+ */
+export function buildThemeCss(config: Pick<ConsentConfig, 'ui'>): string {
+  const sel = (scheme: string) => `.ck-root[data-ck-scheme="${scheme}"],.ck-gate[data-ck-scheme="${scheme}"]`;
+  const layout = themeCss(config.ui?.theme, false);
+  const light = themeCss(config.ui?.theme, true);
+  const dark = themeCss(config.ui?.darkTheme, true);
+  let css = layout ? `.ck-root,.ck-gate{${layout}}` : '';
+  if (light) css += `${sel('light')}{${light}}@media not all and (prefers-color-scheme: dark){${sel('auto')}{${light}}}`;
+  if (dark) css += `${sel('dark')}{${dark}}@media (prefers-color-scheme: dark){${sel('auto')}{${dark}}}`;
   return css;
 }
 
@@ -421,7 +429,7 @@ export function ConsentUI({ owner }: ConsentUIProps = {}) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const pathname = usePathname();
   const host = usePortalHost();
-  const style = useMemo(() => buildStyle(config), [config]);
+  const style = useMemo(() => buildThemeCss(config), [config]);
 
   useEffect(() => getManager().on('ui:open-settings', () => setSettingsOpen(true)), []);
 

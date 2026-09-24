@@ -178,8 +178,8 @@ describe('Einstellungsdialog', () => {
     render(<App config={makeConfig({ ui: { theme: { accent: '#ff0000' }, darkTheme: { accent: '#00ff00' }, colorScheme: 'dark' } })} />);
     await screen.findByTestId('consent-banner');
     const style = document.querySelector('.ck-root style')?.textContent ?? '';
-    expect(style).toContain('--ck-accent:#ff0000');
-    expect(style).toContain('.ck-root[data-ck-scheme="dark"]{--ck-accent:#00ff00;}');
+    expect(style).toContain('.ck-root[data-ck-scheme="light"],.ck-gate[data-ck-scheme="light"]{--ck-accent:#ff0000;}');
+    expect(style).toContain('.ck-root[data-ck-scheme="dark"],.ck-gate[data-ck-scheme="dark"]{--ck-accent:#00ff00;}');
     expect(document.querySelector('.ck-root')?.getAttribute('data-ck-scheme')).toBe('dark');
   });
 });

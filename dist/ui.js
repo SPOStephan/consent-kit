@@ -17,18 +17,19 @@ var THEME_VARS = {
   maxWidth: "--ck-max-width",
   zIndex: "--ck-z"
 };
-function themeCss(theme) {
+var COLOR_KEYS = /* @__PURE__ */ new Set(["background", "text", "accent", "buttonBackground", "buttonText", "border"]);
+function themeCss(theme, colors) {
   if (!theme) return "";
-  return Object.entries(theme).filter(([key, value]) => value && key in THEME_VARS).map(([key, value]) => `${THEME_VARS[key]}:${String(value).replace(/[;{}<>]/g, "")};`).join("");
+  return Object.entries(theme).filter(([key, value]) => value && key in THEME_VARS && COLOR_KEYS.has(key) === colors).map(([key, value]) => `${THEME_VARS[key]}:${String(value).replace(/[;{}<>]/g, "")};`).join("");
 }
-function buildStyle(config) {
-  const light = themeCss(config.ui?.theme);
-  const dark = themeCss(config.ui?.darkTheme);
-  let css = light ? `.ck-root{${light}}` : "";
-  if (dark) {
-    css += `.ck-root[data-ck-scheme="dark"]{${dark}}`;
-    css += `@media (prefers-color-scheme: dark){.ck-root[data-ck-scheme="auto"]{${dark}}}`;
-  }
+function buildThemeCss(config) {
+  const sel = (scheme) => `.ck-root[data-ck-scheme="${scheme}"],.ck-gate[data-ck-scheme="${scheme}"]`;
+  const layout = themeCss(config.ui?.theme, false);
+  const light = themeCss(config.ui?.theme, true);
+  const dark = themeCss(config.ui?.darkTheme, true);
+  let css = layout ? `.ck-root,.ck-gate{${layout}}` : "";
+  if (light) css += `${sel("light")}{${light}}@media not all and (prefers-color-scheme: dark){${sel("auto")}{${light}}}`;
+  if (dark) css += `${sel("dark")}{${dark}}@media (prefers-color-scheme: dark){${sel("auto")}{${dark}}}`;
   return css;
 }
 function pathOf(href) {
@@ -317,7 +318,7 @@ function ConsentUI({ owner } = {}) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const pathname = usePathname();
   const host = usePortalHost();
-  const style = useMemo(() => buildStyle(config), [config]);
+  const style = useMemo(() => buildThemeCss(config), [config]);
   useEffect(() => getManager().on("ui:open-settings", () => setSettingsOpen(true)), []);
   if (!ready || !host) return null;
   const position = config.ui?.position === "center" && !isLegalPage(config, pathname) ? "center" : "bottom";
@@ -331,4 +332,4 @@ function ConsentUI({ owner } = {}) {
   );
 }
 
-export { ConsentBanner, ConsentSettings, ConsentUI };
+export { ConsentBanner, ConsentSettings, ConsentUI, buildThemeCss };

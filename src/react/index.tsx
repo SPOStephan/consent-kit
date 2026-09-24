@@ -224,6 +224,7 @@ export function ConsentGate({ service, children, placeholder, aspectRatio, class
   return (
     <div
       className={['ck-gate', className].filter(Boolean).join(' ')}
+      data-ck-scheme={config.ui?.colorScheme ?? 'auto'}
       style={aspectRatio ? { aspectRatio } : undefined}
       role="group"
       aria-label={`${texts.gateTitle}: ${name}`}

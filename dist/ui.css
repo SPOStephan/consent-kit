@@ -30,7 +30,7 @@
 
 @media (prefers-color-scheme: dark) {
   :where(.ck-root[data-ck-scheme='auto']),
-  :where(.ck-gate) {
+  :where(.ck-gate[data-ck-scheme='auto']) {
     --ck-bg: #1e1f22;
     --ck-text: #f1f1f1;
     --ck-muted: #c4c7cc;
@@ -44,7 +44,8 @@
   }
 }
 
-:where(.ck-root[data-ck-scheme='dark']) {
+:where(.ck-root[data-ck-scheme='dark']),
+:where(.ck-gate[data-ck-scheme='dark']) {
   --ck-bg: #1e1f22;
   --ck-text: #f1f1f1;
   --ck-muted: #c4c7cc;
@@ -414,11 +415,15 @@
 
 .ck-switch input {
   position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 1;
   width: 44px;
   height: 26px;
   margin: 0;
   opacity: 0;
   cursor: pointer;
+  transform: translateY(-50%);
 }
 
 .ck-switch__track {

@@ -107,6 +107,7 @@ function ConsentGate({ service, children, placeholder, aspectRatio, className })
     "div",
     {
       className: ["ck-gate", className].filter(Boolean).join(" "),
+      "data-ck-scheme": config.ui?.colorScheme ?? "auto",
       style: aspectRatio ? { aspectRatio } : void 0,
       role: "group",
       "aria-label": `${texts.gateTitle}: ${name}`,
