@@ -34,12 +34,12 @@ export function getManager(): ConsentManager {
 }
 
 /** Hilfsfunktion für eine vollständig typisierte consent.config.ts. */
-export function defineConfig<const T extends ConsentConfig>(config: T): T {
+export function defineConfig(config: ConsentConfig): ConsentConfig {
   return config;
 }
 
 /** Hilfsfunktion für eigene Dienste (Plugins). */
-export function definePlugin<const T extends ConsentPlugin>(plugin: T): T {
+export function definePlugin(plugin: ConsentPlugin): ConsentPlugin {
   return plugin;
 }
 

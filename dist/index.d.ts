@@ -497,9 +497,9 @@ declare function embed(options: {
  */
 declare function getManager(): ConsentManager;
 /** Hilfsfunktion für eine vollständig typisierte consent.config.ts. */
-declare function defineConfig<const T extends ConsentConfig>(config: T): T;
+declare function defineConfig(config: ConsentConfig): ConsentConfig;
 /** Hilfsfunktion für eigene Dienste (Plugins). */
-declare function definePlugin<const T extends ConsentPlugin>(plugin: T): T;
+declare function definePlugin(plugin: ConsentPlugin): ConsentPlugin;
 /** Startet consent-kit. Mehrfacher Aufruf ist unschädlich. */
 declare function init(config: ConsentConfig): ConsentState;
 /** Alle Kategorien erlauben. */
