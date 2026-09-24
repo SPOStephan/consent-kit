@@ -69,7 +69,7 @@
   "scripts": {
     "build": "node scripts/clean.mjs && tsup",
     "typecheck": "tsc --noEmit",
-    "test": "npm run typecheck && npm run test:unit && npm run test:e2e",
+    "test": "npm run typecheck && npm run test:unit && npm run test:e2e && npm run size",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "demo": "vite --config demo/vite.config.ts",
