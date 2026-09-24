@@ -1,5 +1,5 @@
 import { defineConfig } from 'tsup';
-import { copyFileSync, existsSync } from 'node:fs';
+import { chmodSync, copyFileSync, existsSync } from 'node:fs';
 
 const external = ['react', 'react-dom', 'react/jsx-runtime', 'consent-kit', /^consent-kit\//, 'playwright'];
 
@@ -35,6 +35,9 @@ export default defineConfig([
           platform: 'node' as const,
           external,
           banner: { js: '#!/usr/bin/env node' },
+          async onSuccess() {
+            chmodSync('dist/cli.js', 0o755);
+          },
         },
       ]
     : []),
