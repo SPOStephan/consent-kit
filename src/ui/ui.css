@@ -1,0 +1,526 @@
+/*
+ * consent-kit – Standard-Styles
+ *
+ * Anpassen über CSS-Variablen, z. B. in Ihrer eigenen CSS-Datei:
+ *   .ck-root { --ck-accent: #0a7c55; --ck-radius: 4px; }
+ * oder über `ui.theme` in consent.config.ts.
+ *
+ * Alle Standardwerte stehen in :where(), haben also keine Spezifität –
+ * Ihre eigenen Regeln gewinnen immer.
+ */
+
+:where(.ck-root),
+:where(.ck-gate) {
+  --ck-bg: #ffffff;
+  --ck-text: #1a1a1a;
+  --ck-muted: #4a4a4a;
+  --ck-accent: #0b57d0;
+  --ck-btn-bg: #1f2937;
+  --ck-btn-text: #ffffff;
+  --ck-border: #d0d4da;
+  --ck-surface: #f4f5f7;
+  --ck-radius: 12px;
+  --ck-font: inherit;
+  --ck-max-width: 960px;
+  --ck-z: 2147483000;
+  --ck-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  --ck-backdrop: rgba(0, 0, 0, 0.45);
+  --ck-focus: 3px solid var(--ck-accent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :where(.ck-root[data-ck-scheme='auto']),
+  :where(.ck-gate) {
+    --ck-bg: #1e1f22;
+    --ck-text: #f1f1f1;
+    --ck-muted: #c4c7cc;
+    --ck-accent: #8ab4f8;
+    --ck-btn-bg: #f1f1f1;
+    --ck-btn-text: #111111;
+    --ck-border: #45474d;
+    --ck-surface: #2a2b2f;
+    --ck-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --ck-backdrop: rgba(0, 0, 0, 0.65);
+  }
+}
+
+:where(.ck-root[data-ck-scheme='dark']) {
+  --ck-bg: #1e1f22;
+  --ck-text: #f1f1f1;
+  --ck-muted: #c4c7cc;
+  --ck-accent: #8ab4f8;
+  --ck-btn-bg: #f1f1f1;
+  --ck-btn-text: #111111;
+  --ck-border: #45474d;
+  --ck-surface: #2a2b2f;
+  --ck-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --ck-backdrop: rgba(0, 0, 0, 0.65);
+}
+
+.ck-root,
+.ck-root *,
+.ck-gate,
+.ck-gate * {
+  box-sizing: border-box;
+}
+
+.ck-root {
+  font-family: var(--ck-font);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ck-text);
+}
+
+/* ------------------------------------------------------------ Grundelemente */
+
+.ck-title {
+  margin: 0 0 0.5em;
+  font-size: 1.15em;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ck-text);
+}
+
+.ck-text {
+  margin: 0 0 0.75em;
+  color: var(--ck-text);
+}
+
+.ck-note {
+  margin: 0 0 0.75em;
+  padding: 0.5em 0.75em;
+  border-left: 4px solid var(--ck-accent);
+  background: var(--ck-surface);
+  color: var(--ck-text);
+}
+
+.ck-root a,
+.ck-gate a {
+  color: var(--ck-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ck-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25em 1.25em;
+  margin: 0;
+}
+
+.ck-root :focus-visible,
+.ck-gate :focus-visible {
+  outline: var(--ck-focus);
+  outline-offset: 2px;
+}
+
+.ck-banner:focus,
+.ck-dialog:focus {
+  outline: none;
+}
+
+.ck-banner:focus-visible,
+.ck-dialog:focus-visible {
+  outline: var(--ck-focus);
+  outline-offset: 2px;
+}
+
+/* Alle Buttons sehen gleich aus – bewusst keine Hervorhebung von "Akzeptieren". */
+.ck-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.6em 1.2em;
+  border: 2px solid var(--ck-btn-bg);
+  border-radius: calc(var(--ck-radius) * 0.66);
+  background: var(--ck-btn-bg);
+  color: var(--ck-btn-text);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+}
+
+.ck-btn:hover {
+  filter: brightness(1.15);
+}
+
+.ck-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5em;
+}
+
+.ck-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ck-z);
+  background: var(--ck-backdrop);
+}
+
+/* ------------------------------------------------------------ Banner */
+
+.ck-banner {
+  position: fixed;
+  z-index: calc(var(--ck-z) + 1);
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  max-height: min(85vh, 85dvh);
+  overflow-y: auto;
+  padding: 1.25em;
+  border: 1px solid var(--ck-border);
+  border-radius: var(--ck-radius);
+  background: var(--ck-bg);
+  color: var(--ck-text);
+  box-shadow: var(--ck-shadow);
+}
+
+.ck-banner--bottom {
+  left: 50%;
+  bottom: 16px;
+  width: calc(100% - 32px);
+  max-width: var(--ck-max-width);
+  transform: translateX(-50%);
+}
+
+.ck-banner--center {
+  top: 50%;
+  left: 50%;
+  width: calc(100% - 32px);
+  max-width: min(640px, var(--ck-max-width));
+  transform: translate(-50%, -50%);
+}
+
+@media (min-width: 900px) {
+  .ck-banner--bottom {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+  .ck-banner--bottom .ck-banner__body {
+    flex: 1 1 auto;
+  }
+  .ck-banner--bottom .ck-actions {
+    flex: 0 0 auto;
+    grid-template-columns: 1fr;
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 560px) {
+  .ck-root {
+    font-size: 15px;
+  }
+  .ck-banner {
+    padding: 1em;
+  }
+  .ck-banner--bottom {
+    bottom: 8px;
+    width: calc(100% - 16px);
+  }
+  .ck-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ------------------------------------------------------------ Dialog */
+
+.ck-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: calc(var(--ck-z) + 1);
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 32px);
+  max-width: min(760px, var(--ck-max-width));
+  max-height: min(90vh, 90dvh);
+  border: 1px solid var(--ck-border);
+  border-radius: var(--ck-radius);
+  background: var(--ck-bg);
+  color: var(--ck-text);
+  box-shadow: var(--ck-shadow);
+  transform: translate(-50%, -50%);
+}
+
+.ck-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 1.25em 1.25em 0.5em;
+}
+
+.ck-dialog__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0 1.25em 1em;
+}
+
+.ck-dialog__footer {
+  padding: 1em 1.25em 1.25em;
+  border-top: 1px solid var(--ck-border);
+}
+
+.ck-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  margin: -0.5em -0.5em 0 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ck-text);
+  font-size: 1.75em;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ck-close:hover {
+  background: var(--ck-surface);
+}
+
+@media (max-width: 560px) {
+  .ck-dialog {
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: var(--ck-radius) var(--ck-radius) 0 0;
+    transform: translateX(-50%);
+  }
+  .ck-dialog__header,
+  .ck-dialog__body,
+  .ck-dialog__footer {
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+}
+
+.ck-categories,
+.ck-services,
+.ck-cookies {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ck-category {
+  margin: 0 0 0.75em;
+  padding: 1em;
+  border: 1px solid var(--ck-border);
+  border-radius: calc(var(--ck-radius) * 0.66);
+}
+
+.ck-category__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+.ck-category__label {
+  font-weight: 700;
+}
+
+.ck-category__desc {
+  margin: 0.5em 0;
+  color: var(--ck-muted);
+}
+
+.ck-badge {
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  background: var(--ck-surface);
+  color: var(--ck-text);
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.ck-details-toggle {
+  min-height: 44px;
+  padding: 0.25em 0;
+  border: 0;
+  background: none;
+  color: var(--ck-accent);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.ck-service {
+  margin-top: 0.75em;
+  padding: 0.75em;
+  border-radius: calc(var(--ck-radius) * 0.5);
+  background: var(--ck-surface);
+}
+
+.ck-service__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.ck-service__name {
+  font-weight: 700;
+}
+
+.ck-service__meta {
+  display: grid;
+  grid-template-columns: minmax(8em, max-content) 1fr;
+  gap: 0.25em 1em;
+  margin: 0;
+  font-size: 0.9em;
+}
+
+.ck-service__meta dt {
+  font-weight: 600;
+}
+
+.ck-service__meta dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 560px) {
+  .ck-service__meta {
+    grid-template-columns: 1fr;
+  }
+  .ck-service__meta dd {
+    margin-bottom: 0.5em;
+  }
+}
+
+/* ------------------------------------------------------------ Schalter */
+
+.ck-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.ck-switch input {
+  position: absolute;
+  width: 44px;
+  height: 26px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.ck-switch__track {
+  position: relative;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 26px;
+  border: 2px solid var(--ck-muted);
+  border-radius: 999px;
+  background: var(--ck-bg);
+}
+
+.ck-switch__track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ck-muted);
+}
+
+.ck-switch input:checked + .ck-switch__track {
+  border-color: var(--ck-accent);
+  background: var(--ck-accent);
+}
+
+.ck-switch input:checked + .ck-switch__track::after {
+  left: 21px;
+  background: var(--ck-bg);
+}
+
+.ck-switch input:disabled + .ck-switch__track {
+  opacity: 0.6;
+}
+
+.ck-switch input:disabled {
+  cursor: not-allowed;
+}
+
+.ck-switch input:focus-visible + .ck-switch__track {
+  outline: var(--ck-focus);
+  outline-offset: 2px;
+}
+
+.ck-switch--small .ck-switch__text {
+  font-size: 0.9em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ck-switch__track::after {
+    transition: left 0.15s ease;
+  }
+}
+
+/* ------------------------------------------------------------ Footer-Link */
+
+.ck-settings-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------------ ConsentGate */
+
+.ck-gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 200px;
+  padding: 1.25em;
+  border: 1px solid var(--ck-border);
+  border-radius: var(--ck-radius);
+  background: var(--ck-surface);
+  color: var(--ck-text);
+  font-family: var(--ck-font);
+  line-height: 1.5;
+}
+
+.ck-gate__inner {
+  max-width: 36em;
+  text-align: center;
+}
+
+.ck-gate__title {
+  margin: 0 0 0.5em;
+  font-weight: 700;
+}
+
+.ck-gate__text,
+.ck-gate__hint {
+  margin: 0 0 0.75em;
+}
+
+.ck-gate__hint {
+  margin: 0.75em 0 0;
+  color: var(--ck-muted);
+  font-size: 0.85em;
+}

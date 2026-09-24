@@ -259,6 +259,10 @@ interface ConsentEventMap {
         state: ConsentState;
         revokedServices: string[];
     };
+    /** Routenwechsel wurde gemeldet (notifyRouteChange). */
+    'route:changed': {
+        route: RouteInfo;
+    };
     /** openSettings() wurde aufgerufen (für die UI). */
     'ui:open-settings': Record<string, never>;
 }
@@ -342,6 +346,11 @@ declare function resolveLanguage(config: Pick<ConsentConfig, 'language'>): Langu
 declare function resolveTexts(config: ConsentConfig, language?: Language): Texts;
 /** Ersetzt {platzhalter} in einem Text. */
 declare function formatText(template: string, values: Record<string, string>): string;
+/**
+ * Angaben zum eigenen Einwilligungs-Cookie (Kategorie "notwendig") – für Dialog
+ * und Datenschutz-Tabelle. MUSTERTEXT – rechtlich prüfen lassen.
+ */
+declare function consentCookieMeta(config: ConsentConfig, owner?: string): ServiceMeta;
 
 /**
  * Fügt ein externes Skript dynamisch per <script>-Element ein.
@@ -520,4 +529,4 @@ declare function notifyRouteChange(path?: string): void;
  */
 declare function autoTrackRouteChanges(): () => void;
 
-export { BUILT_IN_CATEGORIES, type BuiltInCategory, type CategoryDefinition, type CategoryId, type ConsentAction, type ConsentConfig, type ConsentEvent, type ConsentEventMap, ConsentManager, type ConsentPlugin, type ConsentState, type CookieInfo, type CookiePattern, type DeepPartial, type EmbedOptions, GOOGLE_ADS_COOKIE_PATTERNS, GOOGLE_ANALYTICS_COOKIE_PATTERNS, type GoogleTagManagerOptions, type Language, type LocalizedText, type MetaPixelOptions, type PluginContext, type RouteInfo, type ServiceMeta, type Texts, type ThemeVariables, type TikTokPixelOptions, acceptAll, autoTrackRouteChanges, defaultTexts, defineConfig, definePlugin, deleteCookies, embed, formatText, getManager, getState, googleMaps, googleTagManager, hasConsent, init, loadScript, matchesPattern, metaPixel, notifyRouteChange, on, openSettings, rejectAll, resolveLanguage, resolveTexts, serviceCategories, setCategories, setService, tiktokPixel, youtube };
+export { BUILT_IN_CATEGORIES, type BuiltInCategory, type CategoryDefinition, type CategoryId, type ConsentAction, type ConsentConfig, type ConsentEvent, type ConsentEventMap, ConsentManager, type ConsentPlugin, type ConsentState, type CookieInfo, type CookiePattern, type DeepPartial, type EmbedOptions, GOOGLE_ADS_COOKIE_PATTERNS, GOOGLE_ANALYTICS_COOKIE_PATTERNS, type GoogleTagManagerOptions, type Language, type LocalizedText, type MetaPixelOptions, type PluginContext, type RouteInfo, type ServiceMeta, type Texts, type ThemeVariables, type TikTokPixelOptions, acceptAll, autoTrackRouteChanges, consentCookieMeta, defaultTexts, defineConfig, definePlugin, deleteCookies, embed, formatText, getManager, getState, googleMaps, googleTagManager, hasConsent, init, loadScript, matchesPattern, metaPixel, notifyRouteChange, on, openSettings, rejectAll, resolveLanguage, resolveTexts, serviceCategories, setCategories, setService, tiktokPixel, youtube };

@@ -197,6 +197,7 @@ export class ConsentManager {
     this.lastPath = path;
     this.lastUrl = location.href;
     const ctx = this.context();
+    this.emit('route:changed', { route });
     for (const plugin of this.config.services) {
       if (!this.active.has(plugin.id)) continue;
       this.safe(plugin, 'onRouteChange', () => plugin.onRouteChange?.(ctx, route));

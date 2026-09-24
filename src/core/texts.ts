@@ -1,4 +1,4 @@
-import type { ConsentConfig, DeepPartial, Language, Texts } from './types';
+import type { ConsentConfig, DeepPartial, Language, ServiceMeta, Texts } from './types';
 
 /*
  * ============================================================================
@@ -160,4 +160,24 @@ export function resolveTexts(config: ConsentConfig, language = resolveLanguage(c
 /** Ersetzt {platzhalter} in einem Text. */
 export function formatText(template: string, values: Record<string, string>): string {
   return template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? '');
+}
+
+/**
+ * Angaben zum eigenen Einwilligungs-Cookie (Kategorie "notwendig") – für Dialog
+ * und Datenschutz-Tabelle. MUSTERTEXT – rechtlich prüfen lassen.
+ */
+export function consentCookieMeta(config: ConsentConfig, owner = ''): ServiceMeta {
+  const days = Math.min(config.cookie?.maxAgeDays ?? 365, 365);
+  const duration = days === 365 ? { de: '12 Monate', en: '12 months' } : { de: `${days} Tage`, en: `${days} days` };
+  return {
+    name: 'Einwilligungs-Speicher (consent-kit)',
+    provider: owner || '–',
+    purpose: {
+      de: 'Speichert Ihre Datenschutz-Einstellungen (anonyme Consent-ID, Zeitpunkt, Version der Einstellungen, gewählte Kategorien).',
+      en: 'Stores your privacy settings (anonymous consent ID, time, settings version, selected categories).',
+    },
+    cookies: [{ name: config.cookie?.name ?? 'consent_kit', duration }],
+    thirdCountryTransfer: null,
+    privacyPolicyUrl: config.links.privacy,
+  };
 }

@@ -10,7 +10,7 @@ import type { ConsentConfig, ConsentEvent, ConsentEventMap, ConsentPlugin, Conse
 
 export type * from './core/types';
 export { ConsentManager, serviceCategories, BUILT_IN_CATEGORIES } from './core/manager';
-export { defaultTexts, resolveLanguage, resolveTexts, formatText } from './core/texts';
+export { defaultTexts, resolveLanguage, resolveTexts, formatText, consentCookieMeta } from './core/texts';
 export { loadScript } from './core/scripts';
 export { deleteCookies, matchesPattern } from './core/cookies';
 export { googleTagManager, GOOGLE_ANALYTICS_COOKIE_PATTERNS, GOOGLE_ADS_COOKIE_PATTERNS } from './plugins/google';

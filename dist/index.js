@@ -240,6 +240,7 @@ var ConsentManager = class {
     this.lastPath = path;
     this.lastUrl = location.href;
     const ctx = this.context();
+    this.emit("route:changed", { route });
     for (const plugin of this.config.services) {
       if (!this.active.has(plugin.id)) continue;
       this.safe(plugin, "onRouteChange", () => plugin.onRouteChange?.(ctx, route));
@@ -609,6 +610,21 @@ function resolveTexts(config, language = resolveLanguage(config)) {
 }
 function formatText(template, values) {
   return template.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? "");
+}
+function consentCookieMeta(config, owner = "") {
+  const days = Math.min(config.cookie?.maxAgeDays ?? 365, 365);
+  const duration = days === 365 ? { de: "12 Monate", en: "12 months" } : { de: `${days} Tage`, en: `${days} days` };
+  return {
+    name: "Einwilligungs-Speicher (consent-kit)",
+    provider: owner || "\u2013",
+    purpose: {
+      de: "Speichert Ihre Datenschutz-Einstellungen (anonyme Consent-ID, Zeitpunkt, Version der Einstellungen, gew\xE4hlte Kategorien).",
+      en: "Stores your privacy settings (anonymous consent ID, time, settings version, selected categories)."
+    },
+    cookies: [{ name: config.cookie?.name ?? "consent_kit", duration }],
+    thirdCountryTransfer: null,
+    privacyPolicyUrl: config.links.privacy
+  };
 }
 
 // src/plugins/google.ts
@@ -1038,4 +1054,4 @@ function autoTrackRouteChanges() {
   };
 }
 
-export { BUILT_IN_CATEGORIES, ConsentManager, GOOGLE_ADS_COOKIE_PATTERNS, GOOGLE_ANALYTICS_COOKIE_PATTERNS, acceptAll, autoTrackRouteChanges, defaultTexts, defineConfig, definePlugin, deleteCookies, embed, formatText, getManager, getState, googleMaps, googleTagManager, hasConsent, init, loadScript, matchesPattern, metaPixel, notifyRouteChange, on, openSettings, rejectAll, resolveLanguage, resolveTexts, serviceCategories, setCategories, setService, tiktokPixel, youtube };
+export { BUILT_IN_CATEGORIES, ConsentManager, GOOGLE_ADS_COOKIE_PATTERNS, GOOGLE_ANALYTICS_COOKIE_PATTERNS, acceptAll, autoTrackRouteChanges, consentCookieMeta, defaultTexts, defineConfig, definePlugin, deleteCookies, embed, formatText, getManager, getState, googleMaps, googleTagManager, hasConsent, init, loadScript, matchesPattern, metaPixel, notifyRouteChange, on, openSettings, rejectAll, resolveLanguage, resolveTexts, serviceCategories, setCategories, setService, tiktokPixel, youtube };

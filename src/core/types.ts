@@ -265,6 +265,8 @@ export interface ConsentEventMap {
   'consent:changed': { state: ConsentState; previous: ConsentState; action: ConsentAction };
   /** Wenn mindestens ein zuvor erlaubter Dienst widerrufen wurde. */
   'consent:revoked': { state: ConsentState; revokedServices: string[] };
+  /** Routenwechsel wurde gemeldet (notifyRouteChange). */
+  'route:changed': { route: RouteInfo };
   /** openSettings() wurde aufgerufen (für die UI). */
   'ui:open-settings': Record<string, never>;
 }
