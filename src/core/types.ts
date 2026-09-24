@@ -71,6 +71,11 @@ export interface PluginContext {
   loadScript(src: string, attributes?: Record<string, string>): Promise<void>;
   /** Debug-Ausgabe (nur wenn `debug: true`). */
   log(...args: unknown[]): void;
+  /**
+   * Fordert nach der aktuellen Entscheidung einen Seiten-Reload an (z. B. wenn
+   * ein Teil-Widerruf ein bereits geladenes Skript betrifft).
+   */
+  requestReload(): void;
 }
 
 /**

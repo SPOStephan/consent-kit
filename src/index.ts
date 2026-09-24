@@ -13,6 +13,8 @@ export { ConsentManager, serviceCategories, BUILT_IN_CATEGORIES } from './core/m
 export { defaultTexts, resolveLanguage, resolveTexts, formatText } from './core/texts';
 export { loadScript } from './core/scripts';
 export { deleteCookies, matchesPattern } from './core/cookies';
+export { googleTagManager, GOOGLE_ANALYTICS_COOKIE_PATTERNS, GOOGLE_ADS_COOKIE_PATTERNS } from './plugins/google';
+export type { GoogleTagManagerOptions } from './plugins/google';
 // PLUGINS
 
 const GLOBAL_KEY = '__consentKit__';

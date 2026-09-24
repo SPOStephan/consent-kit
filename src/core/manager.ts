@@ -70,6 +70,7 @@ export class ConsentManager {
   private lastUrl = '';
   private ready = false;
   private reloadScheduled = false;
+  private reloadRequested = false;
 
   /** Initialisiert consent-kit. Mehrfacher Aufruf ist unschädlich (StrictMode, Hot Reload). */
   init(config: ConsentConfig): ConsentState {
@@ -252,6 +253,7 @@ export class ConsentManager {
       (p) => revoked.includes(p.id) && this.active.has(p.id) && typeof p.onGrant === 'function',
     );
 
+    this.reloadRequested = false;
     this.applyPlugins(revoked);
     this.cleanupCookies();
 
@@ -260,7 +262,7 @@ export class ConsentManager {
     if (revoked.length) this.emit('consent:revoked', { state, revokedServices: revoked });
     this.sendLog(action);
 
-    if (needsReload && config.reloadOnRevoke !== false && !this.reloadScheduled) {
+    if ((needsReload || this.reloadRequested) && config.reloadOnRevoke !== false && !this.reloadScheduled) {
       this.reloadScheduled = true;
       this.log('Widerruf – Seite wird neu geladen, da geladene Skripte nicht entladen werden können.');
       setTimeout(() => location.reload(), 50);
@@ -318,6 +320,9 @@ export class ConsentManager {
       hasConsent: (id) => self.hasConsent(id),
       loadScript,
       log: this.log,
+      requestReload: () => {
+        this.reloadRequested = true;
+      },
     };
   }
 

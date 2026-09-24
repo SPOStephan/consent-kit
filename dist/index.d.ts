@@ -62,6 +62,11 @@ interface PluginContext {
     loadScript(src: string, attributes?: Record<string, string>): Promise<void>;
     /** Debug-Ausgabe (nur wenn `debug: true`). */
     log(...args: unknown[]): void;
+    /**
+     * Fordert nach der aktuellen Entscheidung einen Seiten-Reload an (z. B. wenn
+     * ein Teil-Widerruf ein bereits geladenes Skript betrifft).
+     */
+    requestReload(): void;
 }
 /**
  * Plugin-Interface für einen Dienst.
@@ -274,6 +279,7 @@ declare class ConsentManager {
     private lastUrl;
     private ready;
     private reloadScheduled;
+    private reloadRequested;
     /** Initialisiert consent-kit. Mehrfacher Aufruf ist unschädlich (StrictMode, Hot Reload). */
     init(config: ConsentConfig): ConsentState;
     isReady(): boolean;
@@ -352,6 +358,58 @@ declare function matchesPattern(name: string, pattern: CookiePattern): boolean;
  */
 declare function deleteCookies(patterns: readonly CookiePattern[]): string[];
 
+interface GoogleTagManagerOptions {
+    /** GTM-Container-ID, z. B. "GTM-ABC1234". */
+    id: `GTM-${string}`;
+    /**
+     * Welche Google-Dienste über GTM laufen. Bestimmt die Kategorien und die
+     * Angaben im Einstellungsdialog. Standard: beide true.
+     */
+    analytics?: boolean;
+    ads?: boolean;
+    /** Name des dataLayer. Standard: "dataLayer". */
+    dataLayerName?: string;
+    /**
+     * Herkunft des GTM-Skripts, z. B. für Server-Side-Tagging mit eigener Domain.
+     * Standard: "https://www.googletagmanager.com".
+     */
+    scriptOrigin?: string;
+    /** GTM-Umgebung (Environments), optional. */
+    environment?: {
+        auth: string;
+        preview: string;
+    };
+    /** Name des dataLayer-Events nach jeder Entscheidung. Standard: "consent_update". */
+    consentEvent?: string;
+    /** Name des dataLayer-Events bei Routenwechsel (SPA). Standard: "virtual_pageview". */
+    pageViewEvent?: string;
+    /** Anzeigen-Daten schwärzen, solange ad_storage verweigert ist. Standard: true. */
+    adsDataRedaction?: boolean;
+    /** URL-Passthrough für Google Ads. Standard: false. */
+    urlPassthrough?: boolean;
+    /**
+     * ⚠️ RECHTLICH RISKANT – nur nach Rücksprache mit Ihrer Rechtsberatung aktivieren!
+     *
+     * Lädt den Google Tag Manager bereits VOR der Einwilligung (Consent Mode
+     * "advanced"). Dadurch gehen schon vor jeder Entscheidung Requests an Google
+     * (u. a. cookielose Pings mit IP-Adresse und Geräteinformationen). Das ist nach
+     * § 25 TDDDG / DSGVO umstritten. Standard: false ("strict mode").
+     */
+    loadBeforeConsent?: boolean;
+}
+declare const GOOGLE_ANALYTICS_COOKIE_PATTERNS: readonly CookiePattern[];
+declare const GOOGLE_ADS_COOKIE_PATTERNS: readonly CookiePattern[];
+/**
+ * Google Tag Manager mit Google Consent Mode v2.
+ *
+ * - Beim Start: dataLayer + gtag anlegen und Consent-Defaults setzen (alles
+ *   "denied" außer security_storage). Dabei geht KEIN Request an Google.
+ * - Nach Einwilligung: gtag('consent', 'update', …) je Kategorie, Event
+ *   "consent_update" ins dataLayer, danach GTM laden.
+ * - Bei Routenwechsel: Event "virtual_pageview" ins dataLayer.
+ */
+declare function googleTagManager(options: GoogleTagManagerOptions): ConsentPlugin;
+
 /**
  * consent-kit – Core (framework-unabhängig, ohne React).
  *
@@ -398,4 +456,4 @@ declare function notifyRouteChange(path?: string): void;
  */
 declare function autoTrackRouteChanges(): () => void;
 
-export { BUILT_IN_CATEGORIES, type BuiltInCategory, type CategoryDefinition, type CategoryId, type ConsentAction, type ConsentConfig, type ConsentEvent, type ConsentEventMap, ConsentManager, type ConsentPlugin, type ConsentState, type CookieInfo, type CookiePattern, type DeepPartial, type Language, type LocalizedText, type PluginContext, type RouteInfo, type ServiceMeta, type Texts, type ThemeVariables, acceptAll, autoTrackRouteChanges, defaultTexts, defineConfig, definePlugin, deleteCookies, formatText, getManager, getState, hasConsent, init, loadScript, matchesPattern, notifyRouteChange, on, openSettings, rejectAll, resolveLanguage, resolveTexts, serviceCategories, setCategories, setService };
+export { BUILT_IN_CATEGORIES, type BuiltInCategory, type CategoryDefinition, type CategoryId, type ConsentAction, type ConsentConfig, type ConsentEvent, type ConsentEventMap, ConsentManager, type ConsentPlugin, type ConsentState, type CookieInfo, type CookiePattern, type DeepPartial, GOOGLE_ADS_COOKIE_PATTERNS, GOOGLE_ANALYTICS_COOKIE_PATTERNS, type GoogleTagManagerOptions, type Language, type LocalizedText, type PluginContext, type RouteInfo, type ServiceMeta, type Texts, type ThemeVariables, acceptAll, autoTrackRouteChanges, defaultTexts, defineConfig, definePlugin, deleteCookies, formatText, getManager, getState, googleTagManager, hasConsent, init, loadScript, matchesPattern, notifyRouteChange, on, openSettings, rejectAll, resolveLanguage, resolveTexts, serviceCategories, setCategories, setService };
