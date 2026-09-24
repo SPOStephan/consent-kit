@@ -15,7 +15,12 @@ export { loadScript } from './core/scripts';
 export { deleteCookies, matchesPattern } from './core/cookies';
 export { googleTagManager, GOOGLE_ANALYTICS_COOKIE_PATTERNS, GOOGLE_ADS_COOKIE_PATTERNS } from './plugins/google';
 export type { GoogleTagManagerOptions } from './plugins/google';
-// PLUGINS
+export { metaPixel } from './plugins/meta';
+export type { MetaPixelOptions } from './plugins/meta';
+export { tiktokPixel } from './plugins/tiktok';
+export type { TikTokPixelOptions } from './plugins/tiktok';
+export { youtube, googleMaps, embed } from './plugins/embeds';
+export type { EmbedOptions } from './plugins/embeds';
 
 const GLOBAL_KEY = '__consentKit__';
 

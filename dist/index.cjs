@@ -765,6 +765,219 @@ function googleTagManager(options) {
   };
 }
 
+// src/plugins/meta.ts
+function installStub(w) {
+  if (w.fbq) return w.fbq;
+  const n = function(...args) {
+    if (n.callMethod) n.callMethod(...args);
+    else n.queue.push(args);
+  };
+  n.push = n;
+  n.loaded = true;
+  n.version = "2.0";
+  n.queue = [];
+  w.fbq = n;
+  if (!w._fbq) w._fbq = n;
+  return n;
+}
+function metaPixel(options) {
+  const viaKit = options.loadVia !== "gtm";
+  const trackRouteChanges = options.loadVia !== "gtm" && options.trackRouteChanges !== false;
+  return {
+    id: "meta-pixel",
+    category: "marketing",
+    meta: {
+      name: "Meta Pixel",
+      provider: "Meta Platforms Ireland Limited, Merrion Road, Dublin 4, D04 X2K5, Irland",
+      purpose: {
+        de: "Misst den Erfolg von Werbeanzeigen auf Facebook und Instagram (Conversions), bildet Zielgruppen f\xFCr Werbung (Remarketing) und erm\xF6glicht personalisierte Werbung.",
+        en: "Measures the success of ads on Facebook and Instagram (conversions), builds audiences for advertising (remarketing) and enables personalised advertising."
+      },
+      cookies: [
+        { name: "_fbp", duration: { de: "3 Monate", en: "3 months" }, purpose: { de: "Wiedererkennung des Browsers", en: "Recognises the browser" } },
+        { name: "_fbc", duration: { de: "3 Monate", en: "3 months" }, purpose: { de: "Speichert den letzten Klick auf eine Anzeige", en: "Stores the last ad click" } },
+        { name: "fr (facebook.com)", duration: { de: "3 Monate", en: "3 months" }, purpose: { de: "Personalisierte Werbung (Drittanbieter-Cookie)", en: "Personalised advertising (third-party cookie)" } }
+      ],
+      thirdCountryTransfer: {
+        de: "USA (Meta Platforms, Inc.; EU-US Data Privacy Framework, Standardvertragsklauseln)",
+        en: "USA (Meta Platforms, Inc.; EU-US Data Privacy Framework, standard contractual clauses)"
+      },
+      privacyPolicyUrl: "https://www.facebook.com/privacy/policy/"
+    },
+    cookiePatterns: ["_fbp", "_fbc"],
+    onGrant(ctx) {
+      if (!viaKit || !options.id) return;
+      const fbq = installStub(window);
+      fbq.disablePushState = true;
+      fbq.allowDuplicatePageViews = true;
+      fbq("consent", "grant");
+      fbq("init", options.id);
+      fbq("track", "PageView");
+      ctx.log("Meta Pixel wird geladen");
+      void ctx.loadScript("https://connect.facebook.net/en_US/fbevents.js");
+    },
+    onRevoke() {
+      const fbq = window.fbq;
+      if (typeof fbq === "function") fbq("consent", "revoke");
+    },
+    onRouteChange(ctx) {
+      if (!trackRouteChanges) return;
+      const fbq = window.fbq;
+      if (typeof fbq === "function") {
+        fbq("track", "PageView");
+        ctx.log("Meta Pixel: PageView");
+      }
+    }
+  };
+}
+
+// src/plugins/tiktok.ts
+var METHODS = [
+  "page",
+  "track",
+  "identify",
+  "instances",
+  "debug",
+  "on",
+  "off",
+  "once",
+  "ready",
+  "alias",
+  "group",
+  "enableCookie",
+  "disableCookie",
+  "holdConsent",
+  "revokeConsent",
+  "grantConsent"
+];
+function call(method, ...args) {
+  const ttq = window.ttq;
+  const fn = ttq?.[method];
+  if (typeof fn === "function") fn.apply(ttq, args);
+}
+function installStub2(w, loadScript2) {
+  if (w.ttq && typeof w.ttq.load === "function") return w.ttq;
+  w.TiktokAnalyticsObject = "ttq";
+  const ttq = w.ttq = w.ttq ?? [];
+  ttq.methods = METHODS;
+  ttq.setAndDefer = (target, method) => {
+    target[method] = function(...args) {
+      target.push([method, ...args]);
+    };
+  };
+  for (const m of METHODS) ttq.setAndDefer(ttq, m);
+  ttq.instance = (id) => {
+    const e = ttq._i?.[id] ?? [];
+    for (const m of METHODS) ttq.setAndDefer(e, m);
+    return e;
+  };
+  ttq.load = (id, options) => {
+    const base = "https://analytics.tiktok.com/i18n/pixel/events.js";
+    ttq._i = ttq._i ?? {};
+    ttq._i[id] = [];
+    ttq._i[id]._u = base;
+    ttq._t = ttq._t ?? {};
+    ttq._t[id] = Date.now();
+    ttq._o = ttq._o ?? {};
+    ttq._o[id] = options ?? {};
+    void loadScript2(`${base}?sdkid=${encodeURIComponent(id)}&lib=ttq`);
+  };
+  return ttq;
+}
+function tiktokPixel(options) {
+  const viaKit = options.loadVia !== "gtm";
+  const trackRouteChanges = options.loadVia !== "gtm" && options.trackRouteChanges !== false;
+  return {
+    id: "tiktok-pixel",
+    category: "marketing",
+    meta: {
+      name: "TikTok Pixel",
+      provider: "TikTok Technology Limited, 10 Earlsfort Terrace, Dublin, D02 T380, Irland",
+      purpose: {
+        de: "Misst den Erfolg von Werbeanzeigen auf TikTok (Conversions), bildet Zielgruppen f\xFCr Werbung und erm\xF6glicht personalisierte Werbung.",
+        en: "Measures the success of ads on TikTok (conversions), builds audiences for advertising and enables personalised advertising."
+      },
+      cookies: [
+        { name: "_ttp", duration: { de: "13 Monate", en: "13 months" }, purpose: { de: "Wiedererkennung des Browsers", en: "Recognises the browser" } },
+        { name: "_tt_enable_cookie", duration: { de: "13 Monate", en: "13 months" }, purpose: { de: "Pr\xFCft, ob Cookies gesetzt werden k\xF6nnen", en: "Checks whether cookies can be set" } },
+        { name: "ttcsid / ttcsid_<ID>", duration: { de: "13 Monate", en: "13 months" }, purpose: { de: "Sitzungs-Kennung f\xFCr die Conversion-Messung", en: "Session identifier for conversion measurement" } }
+      ],
+      thirdCountryTransfer: {
+        de: "USA, Singapur, weitere Drittl\xE4nder (u. a. Fernzugriff aus China); Standardvertragsklauseln",
+        en: "USA, Singapore, other third countries (including remote access from China); standard contractual clauses"
+      },
+      privacyPolicyUrl: "https://www.tiktok.com/legal/page/eea/privacy-policy/de"
+    },
+    cookiePatterns: ["_ttp", "_tt_enable_cookie", "ttcsid", "ttcsid_*"],
+    onGrant(ctx) {
+      if (!viaKit || !options.id) return;
+      const ttq = installStub2(window, ctx.loadScript);
+      ttq.load(options.id);
+      call("grantConsent");
+      call("page");
+      ctx.log("TikTok Pixel wird geladen");
+    },
+    onRevoke() {
+      call("revokeConsent");
+    },
+    onRouteChange(ctx) {
+      if (!trackRouteChanges) return;
+      call("page");
+      ctx.log("TikTok Pixel: page");
+    }
+  };
+}
+
+// src/plugins/embeds.ts
+var GOOGLE = "Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland";
+var USA = {
+  de: "USA (Google LLC; EU-US Data Privacy Framework, Standardvertragsklauseln)",
+  en: "USA (Google LLC; EU-US Data Privacy Framework, standard contractual clauses)"
+};
+function youtube(options = {}) {
+  return {
+    id: "youtube",
+    category: options.category ?? "marketing",
+    meta: {
+      name: "YouTube",
+      provider: GOOGLE,
+      purpose: {
+        de: "Anzeige eingebetteter Videos. Beim Laden werden u. a. IP-Adresse und Ger\xE4teinformationen an YouTube/Google \xFCbermittelt; Google kann diese Daten auch f\xFCr Werbezwecke nutzen.",
+        en: "Displays embedded videos. When loading, data such as IP address and device information is transferred to YouTube/Google; Google may also use this data for advertising."
+      },
+      cookies: [
+        { name: "VISITOR_INFO1_LIVE", duration: { de: "6 Monate", en: "6 months" } },
+        { name: "YSC", duration: { de: "Sitzung", en: "Session" } },
+        { name: "VISITOR_PRIVACY_METADATA", duration: { de: "6 Monate", en: "6 months" } }
+      ],
+      thirdCountryTransfer: USA,
+      privacyPolicyUrl: "https://policies.google.com/privacy",
+      ...options.meta
+    }
+  };
+}
+function googleMaps(options = {}) {
+  return {
+    id: "google-maps",
+    category: options.category ?? "marketing",
+    meta: {
+      name: "Google Maps",
+      provider: GOOGLE,
+      purpose: {
+        de: "Anzeige interaktiver Karten. Beim Laden werden u. a. IP-Adresse und Ger\xE4teinformationen an Google \xFCbermittelt.",
+        en: "Displays interactive maps. When loading, data such as IP address and device information is transferred to Google."
+      },
+      cookies: [{ name: "NID (google.com)", duration: { de: "6 Monate", en: "6 months" } }],
+      thirdCountryTransfer: USA,
+      privacyPolicyUrl: "https://policies.google.com/privacy",
+      ...options.meta
+    }
+  };
+}
+function embed(options) {
+  return { id: options.id, category: options.category ?? "marketing", meta: options.meta };
+}
+
 // src/index.ts
 var GLOBAL_KEY = "__consentKit__";
 function getManager() {
@@ -837,14 +1050,17 @@ exports.defaultTexts = defaultTexts;
 exports.defineConfig = defineConfig;
 exports.definePlugin = definePlugin;
 exports.deleteCookies = deleteCookies;
+exports.embed = embed;
 exports.formatText = formatText;
 exports.getManager = getManager;
 exports.getState = getState;
+exports.googleMaps = googleMaps;
 exports.googleTagManager = googleTagManager;
 exports.hasConsent = hasConsent;
 exports.init = init;
 exports.loadScript = loadScript;
 exports.matchesPattern = matchesPattern;
+exports.metaPixel = metaPixel;
 exports.notifyRouteChange = notifyRouteChange;
 exports.on = on;
 exports.openSettings = openSettings;
@@ -854,3 +1070,5 @@ exports.resolveTexts = resolveTexts;
 exports.serviceCategories = serviceCategories;
 exports.setCategories = setCategories;
 exports.setService = setService;
+exports.tiktokPixel = tiktokPixel;
+exports.youtube = youtube;

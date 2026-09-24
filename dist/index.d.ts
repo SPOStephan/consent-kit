@@ -411,6 +411,70 @@ declare const GOOGLE_ADS_COOKIE_PATTERNS: readonly CookiePattern[];
 declare function googleTagManager(options: GoogleTagManagerOptions): ConsentPlugin;
 
 /**
+ * Meta Pixel wird ENTWEDER über consent-kit ODER über GTM eingebunden – nie beides,
+ * sonst wird doppelt gezählt.
+ */
+type MetaPixelOptions = {
+    /** Pixel-ID (nur Ziffern), z. B. "123456789012345". */
+    id: string;
+    /** "kit" (Standard): consent-kit lädt den Pixel und sendet PageViews. */
+    loadVia?: 'kit';
+    /** Bei Routenwechsel PageView senden. Standard: true. */
+    trackRouteChanges?: boolean;
+} | {
+    /**
+     * "gtm": Der Pixel ist als Tag in GTM eingerichtet. consent-kit lädt dann
+     * KEIN Skript, zeigt den Dienst aber im Dialog an, sendet beim Widerruf
+     * fbq('consent', 'revoke') und löscht die Cookies.
+     */
+    loadVia: 'gtm';
+    id?: string;
+};
+declare function metaPixel(options: MetaPixelOptions): ConsentPlugin;
+
+/**
+ * TikTok Pixel wird ENTWEDER über consent-kit ODER über GTM eingebunden – nie beides,
+ * sonst wird doppelt gezählt.
+ */
+type TikTokPixelOptions = {
+    /** Pixel-ID, z. B. "C1ABCDEF2GHIJKLMN3OP". */
+    id: string;
+    /** "kit" (Standard): consent-kit lädt den Pixel und sendet PageViews. */
+    loadVia?: 'kit';
+    /** Bei Routenwechsel ttq.page() senden. Standard: true. */
+    trackRouteChanges?: boolean;
+} | {
+    /**
+     * "gtm": Der Pixel ist als Tag in GTM eingerichtet. consent-kit lädt dann
+     * KEIN Skript, zeigt den Dienst aber im Dialog an, sendet beim Widerruf
+     * ttq.revokeConsent() und löscht die Cookies.
+     */
+    loadVia: 'gtm';
+    id?: string;
+};
+declare function tiktokPixel(options: TikTokPixelOptions): ConsentPlugin;
+
+interface EmbedOptions {
+    /** Kategorie. Standard: "marketing". Tipp: eigene Kategorie "media" anlegen. */
+    category?: CategoryId;
+    /** Angaben überschreiben (z. B. Zweck). */
+    meta?: Partial<ServiceMeta>;
+}
+/**
+ * YouTube-Videos. Wird zusammen mit <ConsentGate service="youtube"> verwendet.
+ * Tipp: youtube-nocookie.com als Einbettungs-Domain verwenden.
+ */
+declare function youtube(options?: EmbedOptions): ConsentPlugin;
+/** Google Maps. Wird zusammen mit <ConsentGate service="google-maps"> verwendet. */
+declare function googleMaps(options?: EmbedOptions): ConsentPlugin;
+/** Beliebiger eingebetteter Inhalt (z. B. Vimeo, Calendly) – für <ConsentGate>. */
+declare function embed(options: {
+    id: string;
+    category?: CategoryId;
+    meta: ServiceMeta;
+}): ConsentPlugin;
+
+/**
  * consent-kit – Core (framework-unabhängig, ohne React).
  *
  * Hinweis: consent-kit ist ein technisches Werkzeug. Ob eine Website damit die
@@ -456,4 +520,4 @@ declare function notifyRouteChange(path?: string): void;
  */
 declare function autoTrackRouteChanges(): () => void;
 
-export { BUILT_IN_CATEGORIES, type BuiltInCategory, type CategoryDefinition, type CategoryId, type ConsentAction, type ConsentConfig, type ConsentEvent, type ConsentEventMap, ConsentManager, type ConsentPlugin, type ConsentState, type CookieInfo, type CookiePattern, type DeepPartial, GOOGLE_ADS_COOKIE_PATTERNS, GOOGLE_ANALYTICS_COOKIE_PATTERNS, type GoogleTagManagerOptions, type Language, type LocalizedText, type PluginContext, type RouteInfo, type ServiceMeta, type Texts, type ThemeVariables, acceptAll, autoTrackRouteChanges, defaultTexts, defineConfig, definePlugin, deleteCookies, formatText, getManager, getState, googleTagManager, hasConsent, init, loadScript, matchesPattern, notifyRouteChange, on, openSettings, rejectAll, resolveLanguage, resolveTexts, serviceCategories, setCategories, setService };
+export { BUILT_IN_CATEGORIES, type BuiltInCategory, type CategoryDefinition, type CategoryId, type ConsentAction, type ConsentConfig, type ConsentEvent, type ConsentEventMap, ConsentManager, type ConsentPlugin, type ConsentState, type CookieInfo, type CookiePattern, type DeepPartial, type EmbedOptions, GOOGLE_ADS_COOKIE_PATTERNS, GOOGLE_ANALYTICS_COOKIE_PATTERNS, type GoogleTagManagerOptions, type Language, type LocalizedText, type MetaPixelOptions, type PluginContext, type RouteInfo, type ServiceMeta, type Texts, type ThemeVariables, type TikTokPixelOptions, acceptAll, autoTrackRouteChanges, defaultTexts, defineConfig, definePlugin, deleteCookies, embed, formatText, getManager, getState, googleMaps, googleTagManager, hasConsent, init, loadScript, matchesPattern, metaPixel, notifyRouteChange, on, openSettings, rejectAll, resolveLanguage, resolveTexts, serviceCategories, setCategories, setService, tiktokPixel, youtube };
