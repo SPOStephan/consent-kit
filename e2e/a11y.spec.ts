@@ -95,6 +95,18 @@ test.describe('Mobil und Layout', () => {
     expect(cls).toBe(0);
   });
 
+  test('Platzhalter für Embeds: Text läuft nicht aus der Box', async ({ page }) => {
+    await page.goto('/video');
+    const gate = page.locator('.ck-gate');
+    await expect(gate).toBeVisible();
+    const overflow = await gate.evaluate((el) => el.scrollHeight - el.clientHeight);
+    expect(overflow).toBeLessThanOrEqual(1);
+    const inner = await gate.locator('.ck-gate__inner').boundingBox();
+    const box = await gate.boundingBox();
+    expect(inner!.y).toBeGreaterThanOrEqual(box!.y);
+    expect(inner!.y + inner!.height).toBeLessThanOrEqual(box!.y + box!.height + 1);
+  });
+
   test('Banner passt in den Bildschirm, kein horizontales Scrollen', async ({ page }) => {
     await page.goto('/');
     const box = await banner(page).boundingBox();

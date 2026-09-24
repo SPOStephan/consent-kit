@@ -499,7 +499,6 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 200px;
   padding: 1.25em;
   border: 1px solid var(--ck-border);
   border-radius: var(--ck-radius);
@@ -507,6 +506,11 @@
   color: var(--ck-text);
   font-family: var(--ck-font);
   line-height: 1.5;
+}
+
+/* Ohne Seitenverhältnis: Mindesthöhe. Mit Seitenverhältnis wächst die Box mit dem Text mit. */
+.ck-gate:not([style*='aspect-ratio']) {
+  min-height: 200px;
 }
 
 .ck-gate__inner {
