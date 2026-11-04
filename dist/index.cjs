@@ -168,9 +168,7 @@ var ConsentManager = class {
   }
   /** Alle Kategorie-IDs (eingebaut + eigene). */
   getCategoryIds() {
-    const ids = [...BUILT_IN_CATEGORIES];
-    for (const c of this.config?.categories ?? []) if (!ids.includes(c.id)) ids.push(c.id);
-    return ids;
+    return categoryIds(this.config);
   }
   getServices() {
     return this.config?.services ?? [];
@@ -331,10 +329,7 @@ var ConsentManager = class {
     }
   }
   isGranted(plugin, state) {
-    const override = state.services[plugin.id];
-    if (override !== void 0) return override;
-    if (!state.decided) return false;
-    return serviceCategories(plugin).some((c) => c === "necessary" || state.categories[c] === true);
+    return isServiceGranted(plugin, state);
   }
   gpcActive() {
     return this.config?.respectGpc === true && gpcSignal();
@@ -370,35 +365,7 @@ var ConsentManager = class {
     }
   }
   load() {
-    const config = this.config;
-    const version = String(config.version);
-    const empty = emptyState(version);
-    empty.gpc = this.gpcActive();
-    const raw = readCookie(cookieOptions(config).name);
-    if (!raw) return empty;
-    let stored;
-    try {
-      stored = JSON.parse(decodeURIComponent(raw));
-    } catch {
-      return empty;
-    }
-    if (!stored || typeof stored !== "object" || typeof stored.i !== "string") return empty;
-    const age = Date.now() - Date.parse(stored.t);
-    if (stored.v !== version || !(age >= 0 && age < maxAgeDays(config) * DAY_MS)) {
-      return { ...empty, consentId: stored.i };
-    }
-    const categories = {};
-    for (const id of this.getCategoryIds()) categories[id] = id === "necessary" || (stored.c ?? []).includes(id);
-    const services = {};
-    for (const [id, value] of Object.entries(stored.s ?? {})) services[id] = value === 1;
-    return {
-      ...empty,
-      decided: stored.d === 1,
-      consentId: stored.i,
-      timestamp: stored.t,
-      categories,
-      services
-    };
+    return stateFromCookieValue(readCookie(cookieOptions(this.config).name), this.config, { gpc: this.gpcActive() });
   }
   save() {
     const config = this.config;
@@ -441,6 +408,42 @@ var ConsentManager = class {
     }).catch((error) => this.log("Protokollierung fehlgeschlagen", error));
   }
 };
+function categoryIds(config) {
+  const ids = [...BUILT_IN_CATEGORIES];
+  for (const c of config?.categories ?? []) if (!ids.includes(c.id)) ids.push(c.id);
+  return ids;
+}
+function isServiceGranted(plugin, state) {
+  const override = state.services[plugin.id];
+  if (override !== void 0) return override;
+  if (!state.decided) return false;
+  return serviceCategories(plugin).some((c) => c === "necessary" || state.categories[c] === true);
+}
+function stateFromCookieValue(raw, config, options = {}) {
+  const version = String(config.version);
+  const empty = emptyState(version);
+  empty.gpc = options.gpc === true;
+  if (!raw) return empty;
+  let stored;
+  try {
+    stored = JSON.parse(decodeURIComponent(raw));
+  } catch {
+    return empty;
+  }
+  if (!stored || typeof stored !== "object" || typeof stored.i !== "string") return empty;
+  const age = (options.now ?? Date.now()) - Date.parse(stored.t);
+  if (stored.v !== version || !(age >= 0 && age < maxAgeDays(config) * DAY_MS)) {
+    return { ...empty, consentId: stored.i };
+  }
+  const categories = {};
+  for (const id of categoryIds(config)) categories[id] = id === "necessary" || (stored.c ?? []).includes(id);
+  const services = {};
+  for (const [id, value] of Object.entries(stored.s ?? {})) services[id] = value === 1;
+  return { ...empty, decided: stored.d === 1, consentId: stored.i, timestamp: stored.t, categories, services };
+}
+function consentCookieName(config) {
+  return config.cookie?.name ?? DEFAULT_COOKIE;
+}
 function emptyState(version) {
   return {
     decided: false,
@@ -461,7 +464,7 @@ function maxAgeDays(config) {
 }
 function cookieOptions(config) {
   return {
-    name: config.cookie?.name ?? DEFAULT_COOKIE,
+    name: consentCookieName(config),
     path: config.cookie?.path ?? "/",
     domain: config.cookie?.domain
   };
@@ -784,6 +787,17 @@ function googleTagManager(options) {
 }
 
 // src/plugins/meta.ts
+var META_PIXEL_SERVICE_ID = "meta-pixel";
+var FBC_MAX_AGE_SECONDS = 90 * 24 * 60 * 60;
+function clickIdFromUrl() {
+  if (typeof location === "undefined") return void 0;
+  try {
+    const value = new URLSearchParams(location.search).get("fbclid")?.trim();
+    return value && /^[A-Za-z0-9_\-.]{8,500}$/.test(value) ? value : void 0;
+  } catch {
+    return void 0;
+  }
+}
 function installStub(w) {
   if (w.fbq) return w.fbq;
   const n = function(...args) {
@@ -801,8 +815,9 @@ function installStub(w) {
 function metaPixel(options) {
   const viaKit = options.loadVia !== "gtm";
   const trackRouteChanges = options.loadVia !== "gtm" && options.trackRouteChanges !== false;
+  let entryClickId;
   return {
-    id: "meta-pixel",
+    id: META_PIXEL_SERVICE_ID,
     category: "marketing",
     meta: {
       name: "Meta Pixel",
@@ -823,8 +838,15 @@ function metaPixel(options) {
       privacyPolicyUrl: "https://www.facebook.com/privacy/policy/"
     },
     cookiePatterns: ["_fbp", "_fbc"],
+    onInit() {
+      entryClickId = clickIdFromUrl();
+    },
     onGrant(ctx) {
       if (!viaKit || !options.id) return;
+      if (entryClickId && !clickIdFromUrl() && !readCookie("_fbc")) {
+        writeCookie("_fbc", `fb.1.${Date.now()}.${entryClickId}`, { maxAgeSeconds: FBC_MAX_AGE_SECONDS });
+        ctx.log("Meta Pixel: _fbc aus der Einstiegs-URL gesetzt");
+      }
       const fbq = installStub(window);
       fbq.disablePushState = true;
       fbq.allowDuplicatePageViews = true;

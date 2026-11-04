@@ -114,9 +114,7 @@ export class ConsentManager {
 
   /** Alle Kategorie-IDs (eingebaut + eigene). */
   getCategoryIds(): string[] {
-    const ids: string[] = [...BUILT_IN_CATEGORIES];
-    for (const c of this.config?.categories ?? []) if (!ids.includes(c.id)) ids.push(c.id);
-    return ids;
+    return categoryIds(this.config);
   }
 
   getServices(): readonly ConsentPlugin[] {
@@ -301,10 +299,7 @@ export class ConsentManager {
   }
 
   private isGranted(plugin: ConsentPlugin, state: ConsentState): boolean {
-    const override = state.services[plugin.id];
-    if (override !== undefined) return override;
-    if (!state.decided) return false;
-    return serviceCategories(plugin).some((c) => c === 'necessary' || state.categories[c] === true);
+    return isServiceGranted(plugin, state);
   }
 
   private gpcActive(): boolean {
@@ -350,36 +345,7 @@ export class ConsentManager {
   }
 
   private load(): ConsentState {
-    const config = this.config!;
-    const version = String(config.version);
-    const empty = emptyState(version);
-    empty.gpc = this.gpcActive();
-    const raw = readCookie(cookieOptions(config).name);
-    if (!raw) return empty;
-    let stored: StoredState;
-    try {
-      stored = JSON.parse(decodeURIComponent(raw)) as StoredState;
-    } catch {
-      return empty;
-    }
-    if (!stored || typeof stored !== 'object' || typeof stored.i !== 'string') return empty;
-    // Konfig-Version geändert oder älter als 12 Monate → erneut fragen.
-    const age = Date.now() - Date.parse(stored.t);
-    if (stored.v !== version || !(age >= 0 && age < maxAgeDays(config) * DAY_MS)) {
-      return { ...empty, consentId: stored.i };
-    }
-    const categories: Record<string, boolean> = {};
-    for (const id of this.getCategoryIds()) categories[id] = id === 'necessary' || (stored.c ?? []).includes(id);
-    const services: Record<string, boolean> = {};
-    for (const [id, value] of Object.entries(stored.s ?? {})) services[id] = value === 1;
-    return {
-      ...empty,
-      decided: stored.d === 1,
-      consentId: stored.i,
-      timestamp: stored.t,
-      categories,
-      services,
-    };
+    return stateFromCookieValue(readCookie(cookieOptions(this.config!).name), this.config!, { gpc: this.gpcActive() });
   }
 
   private save(): void {
@@ -426,6 +392,59 @@ export class ConsentManager {
   }
 }
 
+/** Alle Kategorie-IDs einer Konfiguration (eingebaut + eigene). */
+export function categoryIds(config: Pick<ConsentConfig, 'categories'> | undefined): string[] {
+  const ids: string[] = [...BUILT_IN_CATEGORIES];
+  for (const c of config?.categories ?? []) if (!ids.includes(c.id)) ids.push(c.id);
+  return ids;
+}
+
+/** Ist ein Dienst im gegebenen Zustand erlaubt? (Einzelentscheidung vor Kategorie.) */
+export function isServiceGranted(plugin: Pick<ConsentPlugin, 'id' | 'category'>, state: ConsentState): boolean {
+  const override = state.services[plugin.id];
+  if (override !== undefined) return override;
+  if (!state.decided) return false;
+  return serviceCategories(plugin).some((c) => c === 'necessary' || state.categories[c] === true);
+}
+
+/**
+ * Wandelt den (rohen, URL-kodierten) Cookie-Wert in einen Zustand um. Gemeinsame Logik für
+ * Browser und Server: Bei geänderter Konfig-Version oder nach Ablauf (Standard 12 Monate)
+ * gilt die Entscheidung als nicht getroffen.
+ */
+export function stateFromCookieValue(
+  raw: string | undefined | null,
+  config: ConsentConfig,
+  options: { gpc?: boolean; now?: number } = {},
+): ConsentState {
+  const version = String(config.version);
+  const empty = emptyState(version);
+  empty.gpc = options.gpc === true;
+  if (!raw) return empty;
+  let stored: StoredState;
+  try {
+    stored = JSON.parse(decodeURIComponent(raw)) as StoredState;
+  } catch {
+    return empty;
+  }
+  if (!stored || typeof stored !== 'object' || typeof stored.i !== 'string') return empty;
+  // Konfig-Version geändert oder älter als 12 Monate → erneut fragen.
+  const age = (options.now ?? Date.now()) - Date.parse(stored.t);
+  if (stored.v !== version || !(age >= 0 && age < maxAgeDays(config) * DAY_MS)) {
+    return { ...empty, consentId: stored.i };
+  }
+  const categories: Record<string, boolean> = {};
+  for (const id of categoryIds(config)) categories[id] = id === 'necessary' || (stored.c ?? []).includes(id);
+  const services: Record<string, boolean> = {};
+  for (const [id, value] of Object.entries(stored.s ?? {})) services[id] = value === 1;
+  return { ...empty, decided: stored.d === 1, consentId: stored.i, timestamp: stored.t, categories, services };
+}
+
+/** Cookie-Name aus der Konfiguration (Standard "consent_kit"). */
+export function consentCookieName(config: Pick<ConsentConfig, 'cookie'>): string {
+  return config.cookie?.name ?? DEFAULT_COOKIE;
+}
+
 function emptyState(version: string): ConsentState {
   return {
     decided: false,
@@ -449,7 +468,7 @@ function maxAgeDays(config: ConsentConfig): number {
 
 function cookieOptions(config: ConsentConfig) {
   return {
-    name: config.cookie?.name ?? DEFAULT_COOKIE,
+    name: consentCookieName(config),
     path: config.cookie?.path ?? '/',
     domain: config.cookie?.domain,
   };
