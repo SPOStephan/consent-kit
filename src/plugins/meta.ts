@@ -1,4 +1,21 @@
+import { readCookie, writeCookie } from '../core/cookies';
 import type { ConsentPlugin } from '../core/types';
+
+/** Plugin-ID des Meta Pixels – z. B. für hasConsent('meta-pixel'). */
+const META_PIXEL_SERVICE_ID = 'meta-pixel';
+const FBC_MAX_AGE_SECONDS = 90 * 24 * 60 * 60;
+
+
+/** fbclid aus der Einstiegs-URL – nur im Arbeitsspeicher, nie vor der Einwilligung gespeichert. */
+function clickIdFromUrl(): string | undefined {
+  if (typeof location === 'undefined') return undefined;
+  try {
+    const value = new URLSearchParams(location.search).get('fbclid')?.trim();
+    return value && /^[A-Za-z0-9_\-.]{8,500}$/.test(value) ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * Meta Pixel wird ENTWEDER über consent-kit ODER über GTM eingebunden – nie beides,
@@ -53,9 +70,12 @@ function installStub(w: Win): Fbq {
 export function metaPixel(options: MetaPixelOptions): ConsentPlugin {
   const viaKit = options.loadVia !== 'gtm';
   const trackRouteChanges = options.loadVia !== 'gtm' && options.trackRouteChanges !== false;
+  // Klick-ID der Einstiegsseite. Stimmt der Besucher erst nach einem Seitenwechsel zu, steht
+  // fbclid nicht mehr in der URL – Meta könnte den Besuch dann keiner Anzeige zuordnen.
+  let entryClickId: string | undefined;
 
   return {
-    id: 'meta-pixel',
+    id: META_PIXEL_SERVICE_ID,
     category: 'marketing',
     meta: {
       name: 'Meta Pixel',
@@ -77,8 +97,18 @@ export function metaPixel(options: MetaPixelOptions): ConsentPlugin {
     },
     cookiePatterns: ['_fbp', '_fbc'],
 
+    onInit() {
+      entryClickId = clickIdFromUrl();
+    },
+
     onGrant(ctx) {
       if (!viaKit || !options.id) return;
+      // _fbc erst NACH der Einwilligung setzen (Format laut Meta: fb.1.<Zeitstempel ms>.<fbclid>).
+      // Steht fbclid noch in der URL, setzt der Pixel _fbc selbst.
+      if (entryClickId && !clickIdFromUrl() && !readCookie('_fbc')) {
+        writeCookie('_fbc', `fb.1.${Date.now()}.${entryClickId}`, { maxAgeSeconds: FBC_MAX_AGE_SECONDS });
+        ctx.log('Meta Pixel: _fbc aus der Einstiegs-URL gesetzt');
+      }
       const fbq = installStub(window as Win);
       // Meta zählt sonst bei pushState automatisch PageViews → Doppelzählung in SPAs.
       fbq.disablePushState = true;

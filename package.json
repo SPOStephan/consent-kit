@@ -1,6 +1,6 @@
 {
   "name": "consent-kit",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Headless Consent-Management f\u00fcr Vite/React-Websites: Google Tag Manager mit Consent Mode v2, Meta Pixel, TikTok Pixel, Embeds \u2013 Skripte laden erst nach Einwilligung.",
   "license": "MIT",
   "type": "module",
@@ -50,6 +50,26 @@
       "require": {
         "types": "./dist/table.d.cts",
         "default": "./dist/table.cjs"
+      }
+    },
+    "./meta": {
+      "import": {
+        "types": "./dist/meta.d.ts",
+        "default": "./dist/meta.js"
+      },
+      "require": {
+        "types": "./dist/meta.d.cts",
+        "default": "./dist/meta.cjs"
+      }
+    },
+    "./server": {
+      "import": {
+        "types": "./dist/server.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": {
+        "types": "./dist/server.d.cts",
+        "default": "./dist/server.cjs"
       }
     },
     "./package.json": "./package.json"

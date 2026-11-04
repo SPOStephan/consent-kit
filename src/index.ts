@@ -119,3 +119,4 @@ export function autoTrackRouteChanges(): () => void {
     window.removeEventListener('popstate', notify);
   };
 }
+

@@ -5,6 +5,22 @@ Alle wichtigen Änderungen an consent-kit. Versionen folgen [Semantic Versioning
 
 Installation einer bestimmten Version: `npm install github:SPOStephan/consent-kit#vX.Y.Z`
 
+## [0.3.0] – 2026-11-04
+
+### Neu
+- `consent-kit/server`: Einwilligung serverseitig prüfen – `hasServerConsent(cookies, config, id)`,
+  `readConsentState`, `readMetaBrowserIds` (für Meta Conversions API, Serverless/Edge, ohne DOM).
+  Gleiche Regeln wie im Browser (Konfig-Version, Ablauf, Einzelentscheidungen).
+- `consent-kit/meta`: `trackMetaEvent(name, params, { eventId })` sendet Pixel-Ereignisse nur mit
+  Einwilligung und mit `eventID` für die Deduplizierung mit der Conversions API;
+  `getMetaBrowserIds()` liefert `fbp`/`fbc` nur mit Einwilligung.
+- `metaPixel()`: `fbclid` der Einstiegsseite wird nur im Arbeitsspeicher gehalten und bei späterer
+  Einwilligung als `_fbc` gesetzt – Anzeigen-Zuordnung bleibt auch nach Seitenwechsel erhalten.
+- Anleitung [docs/CONVERSIONS-API.md](docs/CONVERSIONS-API.md).
+
+### Intern
+- Cookie-Auswertung als gemeinsame Funktion für Browser und Server (`stateFromCookieValue`).
+
 ## [0.2.0] – 2026-09-24
 
 ### Neu

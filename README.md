@@ -33,7 +33,7 @@ wie **YouTube** und **Google Maps** – und lädt sie erst, **nachdem** Besucher
 ## Installation
 
 ```bash
-npm install github:SPOStephan/consent-kit#v0.2.0
+npm install github:SPOStephan/consent-kit#v0.3.0
 ```
 
 Die Version steht hinter dem `#`. Für ein Update einfach die neue Version installieren,
@@ -117,6 +117,8 @@ Cursor, Manus oder Claude Code.
 | `consent-kit/ui` | Fertiges Banner und Einstellungsdialog: `<ConsentUI />` |
 | `consent-kit/ui.css` | Standard-Styles (CSS-Variablen, Dark Mode) |
 | `consent-kit/table` | Dienste-Tabelle für die Datenschutzerklärung (`toMarkdown`, `toHtml`, `getServiceRows`) |
+| `consent-kit/meta` | Meta-Ereignisse mit Einwilligungsprüfung und Ereignis-ID: `trackMetaEvent`, `getMetaBrowserIds` |
+| `consent-kit/server` | Einwilligung serverseitig prüfen (z. B. vor der Meta Conversions API): `hasServerConsent`, `readConsentState`, `readMetaBrowserIds` |
 
 ## Mitgelieferte Dienste
 
@@ -126,6 +128,9 @@ Cursor, Manus oder Claude Code.
 | `metaPixel({ id })` | Marketing | alternativ `metaPixel({ loadVia: 'gtm' })` |
 | `tiktokPixel({ id })` | Marketing | alternativ `tiktokPixel({ loadVia: 'gtm' })` |
 | `youtube()`, `googleMaps()`, `embed({...})` | Marketing (änderbar) | für `<ConsentGate>` |
+
+> **Meta Conversions API:** Browser- und Server-Ereignisse mit gemeinsamer Ereignis-ID und
+> serverseitiger Einwilligungsprüfung – siehe [docs/CONVERSIONS-API.md](docs/CONVERSIONS-API.md).
 
 > **Meta- und TikTok-Pixel ENTWEDER über consent-kit ODER über GTM einbinden – nie beides**,
 > sonst wird doppelt gezählt. Details in [docs/GTM.md](docs/GTM.md#meta-und-tiktok-über-gtm-oder-über-das-kit).
